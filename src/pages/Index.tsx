@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Hero } from "@/components/Hero";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState as useReactState } from "react";
 import { ContestantCard } from "@/components/ContestantCard";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +35,26 @@ const Index = () => {
   const [contestants, setContestants] = useState<Contestant[]>([]);
   const [siteSettings, setSiteSettings] = useReactState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = () => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return;
+    const target = contestants.find(c =>
+      c.name.toLowerCase().includes(query) ||
+      c.song.toLowerCase().includes(query)
+    );
+    if (!target) {
+      toast.error("검색 결과가 없습니다.");
+      return;
+    }
+    const el = document.getElementById(`contestant-${target.id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2','ring-primary','rounded-md');
+      setTimeout(() => el.classList.remove('ring-2','ring-primary','rounded-md'), 1500);
+    }
+  };
 
   useEffect(() => {
     const fetchContestants = async () => {
@@ -157,6 +179,17 @@ const Index = () => {
       />
       
       <main className="container mx-auto px-4 py-16 max-w-7xl">
+        {/* 검색 영역: 이름/곡명으로 검색 후 해당 카드로 스크롤 */}
+        <div className="mb-10 flex gap-2 items-center">
+          <Input
+            placeholder="참가자 이름 또는 곡명으로 검색"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            className="max-w-md"
+          />
+          <Button onClick={handleSearch}>검색</Button>
+        </div>
         <div className="mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
             참가자 무대
@@ -173,17 +206,18 @@ const Index = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {contestants.map((contestant) => (
-              <ContestantCard 
-                key={contestant.id} 
-                id={contestant.id}
-                name={contestant.name}
-                song={contestant.song}
-                youtube_url={contestant.youtube_url}
-                youtube_id={contestant.youtube_id}
-                views={contestant.views}
-                likes={contestant.likes}
-                vote_count={contestant.vote_count}
-              />
+              <div id={`contestant-${contestant.id}`} key={contestant.id}>
+                <ContestantCard 
+                  id={contestant.id}
+                  name={contestant.name}
+                  song={contestant.song}
+                  youtube_url={contestant.youtube_url}
+                  youtube_id={contestant.youtube_id}
+                  views={contestant.views}
+                  likes={contestant.likes}
+                  vote_count={contestant.vote_count}
+                />
+              </div>
             ))}
           </div>
         )}
