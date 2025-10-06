@@ -101,6 +101,9 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
       
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center space-y-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm mb-4">
+            <Music className="w-10 h-10 text-white" />
+          </div>
           
           <h1 className="text-5xl md:text-7xl font-black text-white text-glow">
             {title || "Voice of Tomorrow"}
