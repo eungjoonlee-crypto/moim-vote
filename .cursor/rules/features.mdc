@@ -1,0 +1,169 @@
+---
+alwaysApply: true
+---
+# 🚀 Feature Implementation Guidelines
+
+## Authentication System
+
+### Social Login Implementation
+The project supports multiple authentication methods:
+
+#### Google OAuth
+```tsx
+// Already implemented in Auth.tsx
+const handleGoogleLogin = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${window.location.origin}/` }
+  });
+};
+```
+
+#### Kakao OAuth
+```tsx
+// Implemented but needs Supabase configuration
+const handleKakaoLogin = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "kakao",
+    options: { redirectTo: `${window.location.origin}/` }
+  });
+};
+```
+
+### Setup Requirements
+1. **Supabase Dashboard**: Enable OAuth providers
+2. **Environment Variables**: Configure in `.env.local`
+3. **Redirect URLs**: Set up in provider dashboards
+
+## Voting System
+
+### Contestant Data Structure
+```tsx
+interface Contestant {
+  id: string;
+  name: string;
+  song: string;
+  youtubeId: string;
+  views: number;
+  likes: number;
+}
+```
+
+### Voting Features
+- **Like/Unlike**: Toggle functionality with visual feedback
+- **Comments**: Real-time comment system
+- **Sharing**: URL copying with toast notifications
+- **YouTube Integration**: Embedded video players
+
+### Implementation Pattern
+```tsx
+// State management for voting
+const [isLiked, setIsLiked] = useState(false);
+const [comments, setComments] = useState<Comment[]>([]);
+
+// Action handlers
+const handleLike = () => {
+  setIsLiked(!isLiked);
+  toast({
+    title: isLiked ? "좋아요 취소" : "좋아요!",
+    description: isLiked ? "좋아요를 취소했습니다." : "이 참가자를 응원합니다!",
+  });
+};
+```
+
+## YouTube Integration
+
+### Video Embedding
+```tsx
+// YouTube iframe with proper attributes
+<iframe
+  src={`https://www.youtube.com/embed/${youtubeId}`}
+  title={`${name} - ${song}`}
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+  className="w-full h-full"
+/>
+```
+
+### Video Data Management
+- Store YouTube video IDs in contestant data
+- Use responsive aspect-ratio containers
+- Implement proper iframe security attributes
+
+## UI/UX Patterns
+
+### Card Components
+```tsx
+// Contestant cards with hover effects
+<Card className="card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
+  <div className="aspect-video relative overflow-hidden bg-black">
+    {/* YouTube iframe */}
+  </div>
+  <div className="p-6 space-y-4">
+    {/* Content */}
+  </div>
+</Card>
+```
+
+### Interactive Elements
+- **Buttons**: Use variant system with proper states
+- **Forms**: Implement validation with React Hook Form
+- **Toasts**: Provide user feedback for all actions
+- **Loading States**: Show progress for async operations
+
+## Data Flow Patterns
+
+### 1. **Authentication Flow**
+```
+User Action → Supabase Auth → Auth State Change → Route Redirect
+```
+
+### 2. **Voting Flow**
+```
+User Vote → Local State Update → Toast Notification → (Future: Database Update)
+```
+
+### 3. **Comment Flow**
+```
+User Comment → Local State Update → UI Update → Toast Confirmation
+```
+
+## Future Enhancements
+
+### Database Integration
+- Connect voting to Supabase database
+- Implement real-time vote counting
+- Add user vote history
+- Create admin dashboard
+
+### Advanced Features
+- **Real-time Updates**: WebSocket connections
+- **Vote Analytics**: Charts and statistics
+- **User Profiles**: Vote history and preferences
+- **Admin Panel**: Contestant management
+
+### Performance Optimizations
+- **Lazy Loading**: For video components
+- **Virtual Scrolling**: For large contestant lists
+- **Caching**: For frequently accessed data
+- **Image Optimization**: For contestant photos
+
+## Testing Considerations
+
+### Unit Tests
+- Component rendering
+- User interactions
+- State management
+- Utility functions
+
+### Integration Tests
+- Authentication flows
+- Voting functionality
+- YouTube integration
+- Toast notifications
+
+### E2E Tests
+- Complete user journeys
+- Cross-browser compatibility
+- Mobile responsiveness
+- Performance benchmarks

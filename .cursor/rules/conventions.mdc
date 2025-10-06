@@ -1,0 +1,231 @@
+---
+alwaysApply: true
+---
+# 📝 Coding Conventions & Best Practices
+
+## TypeScript Conventions
+
+### 1. **Type Definitions**
+```tsx
+// Always define interfaces for component props
+interface ContestantCardProps {
+  id: string;
+  name: string;
+  song: string;
+  youtubeId: string;
+  views: number;
+  likes: number;
+}
+
+// Use type unions for state
+type AuthMode = 'login' | 'signup';
+```
+
+### 2. **Component Patterns**
+```tsx
+// Functional components with proper typing
+export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: ContestantCardProps) => {
+  // Component logic
+};
+
+// Use forwardRef for reusable components
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    // Implementation
+  }
+);
+```
+
+### 3. **State Management**
+```tsx
+// Use useState for local state
+const [showComments, setShowComments] = useState(false);
+const [comments, setComments] = useState<Comment[]>([]);
+
+// Use custom hooks for reusable logic
+const { toast } = useToast();
+```
+
+## React Patterns
+
+### 1. **Component Structure**
+```tsx
+// Import order: React, libraries, components, types, utils
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
+// Component definition
+export const ComponentName = ({ prop1, prop2 }: Props) => {
+  // Hooks first
+  const [state, setState] = useState();
+  
+  // Event handlers
+  const handleAction = () => {};
+  
+  // Render
+  return <div>...</div>;
+};
+```
+
+### 2. **Event Handling**
+```tsx
+// Async event handlers with proper error handling
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    toast.success("로그인 성공!");
+  } catch (error: any) {
+    toast.error(error.message || "오류가 발생했습니다.");
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+### 3. **Form Handling**
+```tsx
+// Use React Hook Form with Zod validation
+const form = useForm<FormData>({
+  resolver: zodResolver(schema),
+});
+
+// Controlled components
+<Input
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  required
+/>
+```
+
+## File Organization
+
+### 1. **Import Paths**
+```tsx
+// Use path aliases consistently
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+```
+
+### 2. **Component Exports**
+```tsx
+// Named exports for components
+export const Hero = () => { /* ... */ };
+export const ContestantCard = ({ ...props }) => { /* ... */ };
+
+// Default exports for pages
+const Index = () => { /* ... */ };
+export default Index;
+```
+
+### 3. **File Naming**
+- Components: `PascalCase.tsx` (e.g., `ContestantCard.tsx`)
+- Pages: `PascalCase.tsx` (e.g., `Index.tsx`)
+- Hooks: `use-kebab-case.ts` (e.g., `use-toast.ts`)
+- Utils: `camelCase.ts` (e.g., `utils.ts`)
+
+## Supabase Integration
+
+### 1. **Authentication**
+```tsx
+// Use Supabase auth with proper error handling
+const { error } = await supabase.auth.signInWithOAuth({
+  provider: "google",
+  options: {
+    redirectTo: `${window.location.origin}/`,
+  },
+});
+```
+
+### 2. **Database Operations**
+```tsx
+// Use TypeScript types from Supabase
+import type { Database } from "@/integrations/supabase/types";
+
+// Query with proper typing
+const { data, error } = await supabase
+  .from('contestants')
+  .select('*');
+```
+
+## Error Handling
+
+### 1. **Toast Notifications**
+```tsx
+// Success messages
+toast.success("작업이 완료되었습니다!");
+
+// Error messages with fallback
+toast.error(error.message || "오류가 발생했습니다.");
+
+// Custom toast with description
+toast({
+  title: "링크 복사 완료!",
+  description: "참가자 링크가 클립보드에 복사되었습니다.",
+});
+```
+
+### 2. **Loading States**
+```tsx
+// Use loading states for async operations
+const [loading, setLoading] = useState(false);
+
+// Disable buttons during loading
+<Button disabled={loading}>
+  {loading ? "처리 중..." : "제출"}
+</Button>
+```
+
+## Performance Best Practices
+
+### 1. **Component Optimization**
+```tsx
+// Use React.memo for expensive components
+export const ContestantCard = React.memo(({ ...props }) => {
+  // Component logic
+});
+
+// Use useCallback for event handlers
+const handleAction = useCallback(() => {
+  // Handler logic
+}, [dependencies]);
+```
+
+### 2. **Bundle Optimization**
+- Use dynamic imports for large components
+- Leverage Vite's tree shaking
+- Use path aliases to avoid deep imports
+
+## Code Quality
+
+### 1. **ESLint Configuration**
+- Follow the project's ESLint rules in [eslint.config.js](mdc:eslint.config.js)
+- Use TypeScript strict mode where appropriate
+- Disable unused variable warnings for development
+
+### 2. **Code Comments**
+```tsx
+// Use JSDoc for complex functions
+/**
+ * Handles contestant voting with validation
+ * @param contestantId - The ID of the contestant to vote for
+ * @param userId - The ID of the user casting the vote
+ */
+const handleVote = async (contestantId: string, userId: string) => {
+  // Implementation
+};
+```
+
+### 3. **Consistent Formatting**
+- Use Prettier for code formatting
+- Follow the established indentation (2 spaces)
+- Use semicolons consistently
+- Prefer single quotes for strings

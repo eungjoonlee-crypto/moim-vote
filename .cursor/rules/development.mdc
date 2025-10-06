@@ -1,0 +1,224 @@
+---
+alwaysApply: true
+---
+# 🛠️ Development Workflow & Tooling
+
+## Development Environment
+
+### Prerequisites
+- **Node.js**: v20.11.0 (installed locally)
+- **Package Manager**: npm v10.2.4
+- **Development Server**: Vite on port 8080
+
+### Getting Started
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Build Configuration
+
+### Vite Configuration
+Reference [vite.config.ts](mdc:vite.config.ts) for build settings:
+- **Port**: 8080 (custom port for development)
+- **Host**: `::` (IPv6 support)
+- **Aliases**: `@/*` → `./src/*`
+- **Plugins**: React SWC, Lovable Tagger (dev mode)
+
+### TypeScript Configuration
+Reference [tsconfig.json](mdc:tsconfig.json) for compiler options:
+- **Path Mapping**: `@/*` aliases configured
+- **Strict Mode**: Relaxed for development flexibility
+- **Target**: Modern ES features
+
+## Package Management
+
+### Core Dependencies
+```json
+{
+  "react": "^18.3.1",
+  "react-dom": "^18.3.1",
+  "react-router-dom": "^6.30.1",
+  "@supabase/supabase-js": "^2.58.0",
+  "@tanstack/react-query": "^5.83.0"
+}
+```
+
+### UI Dependencies
+```json
+{
+  "@radix-ui/react-*": "^1.x.x",  // 15+ Radix UI packages
+  "tailwindcss": "^3.4.17",
+  "class-variance-authority": "^0.7.1",
+  "lucide-react": "^0.462.0"
+}
+```
+
+### Development Dependencies
+```json
+{
+  "vite": "^5.4.19",
+  "typescript": "^5.8.3",
+  "eslint": "^9.32.0",
+  "tailwindcss": "^3.4.17"
+}
+```
+
+## Code Quality Tools
+
+### ESLint Configuration
+Reference [eslint.config.js](mdc:eslint.config.js):
+- **TypeScript ESLint**: Latest rules
+- **React Hooks**: Enforced patterns
+- **React Refresh**: Development warnings
+- **Unused Variables**: Disabled for flexibility
+
+### Linting Commands
+```bash
+# Run ESLint
+npm run lint
+
+# Auto-fix issues
+npm run lint -- --fix
+```
+
+### Code Formatting
+- **Prettier**: Recommended for consistent formatting
+- **EditorConfig**: For consistent editor settings
+- **Tailwind CSS**: Automatic class sorting
+
+## Environment Setup
+
+### Environment Variables
+Create `.env.local` file:
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=your_supabase_url_here
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
+
+# Optional: Kakao OAuth (if using direct integration)
+VITE_KAKAO_CLIENT_ID=your_kakao_client_id_here
+```
+
+### Supabase Setup
+1. **Create Project**: At [supabase.com](https://supabase.com)
+2. **Enable Auth**: Configure OAuth providers
+3. **Database**: Set up tables for contestants/votes
+4. **RLS Policies**: Configure row-level security
+
+## Development Workflow
+
+### Git Workflow
+```bash
+# Feature development
+git checkout -b feature/new-feature
+git add .
+git commit -m "feat: add new feature"
+git push origin feature/new-feature
+```
+
+### Code Organization
+- **Components**: Keep in `src/components/`
+- **Pages**: Keep in `src/pages/`
+- **Hooks**: Keep in `src/hooks/`
+- **Utils**: Keep in `src/lib/`
+- **Types**: Co-locate with components or in `src/types/`
+
+### Import Conventions
+```tsx
+// External libraries first
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// Internal components
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
+// Types and utilities
+import type { Contestant } from "@/types/contestant";
+import { cn } from "@/lib/utils";
+```
+
+## Performance Optimization
+
+### Bundle Analysis
+```bash
+# Analyze bundle size
+npm run build
+npx vite-bundle-analyzer dist
+```
+
+### Development Performance
+- **Hot Module Replacement**: Fast refresh enabled
+- **SWC Compiler**: Faster than Babel
+- **Tree Shaking**: Automatic dead code elimination
+- **Code Splitting**: Route-based splitting
+
+### Production Optimizations
+- **Minification**: Automatic in production builds
+- **Asset Optimization**: Images and fonts
+- **CDN Ready**: Static asset serving
+- **Caching**: Proper cache headers
+
+## Debugging & Development Tools
+
+### Browser DevTools
+- **React DevTools**: Component inspection
+- **Redux DevTools**: State management (if using)
+- **Network Tab**: API call monitoring
+- **Performance Tab**: Rendering analysis
+
+### Development Features
+- **Source Maps**: Full debugging support
+- **Error Overlay**: Vite error display
+- **Hot Reload**: Instant updates
+- **TypeScript**: Real-time type checking
+
+## Deployment Considerations
+
+### Build Output
+- **Static Files**: Ready for CDN deployment
+- **Environment Variables**: Build-time injection
+- **Asset Optimization**: Automatic optimization
+- **Route Handling**: SPA routing support
+
+### Production Checklist
+- [ ] Environment variables configured
+- [ ] Supabase project connected
+- [ ] OAuth providers configured
+- [ ] Build optimization enabled
+- [ ] Error tracking setup
+- [ ] Analytics integration
+
+## Troubleshooting
+
+### Common Issues
+1. **Port Conflicts**: Change port in `vite.config.ts`
+2. **TypeScript Errors**: Check `tsconfig.json` settings
+3. **Import Errors**: Verify path aliases
+4. **Build Failures**: Check dependency versions
+
+### Debug Commands
+```bash
+# Check Node version
+node --version
+
+# Check npm version
+npm --version
+
+# Clear npm cache
+npm cache clean --force
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+```

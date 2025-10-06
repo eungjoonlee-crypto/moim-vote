@@ -1,0 +1,99 @@
+---
+alwaysApply: true
+---
+# 🎨 Styling & Design System
+
+## Design System Overview
+This project uses a **dark-theme only** design system optimized for a voice competition platform with dramatic gradients and modern aesthetics.
+
+## Color Palette
+```css
+/* Primary Colors */
+--primary: hsl(348 83% 47%)        /* Competition Red */
+--secondary: hsl(263 70% 50%)      /* Purple */
+--accent: hsl(45 93% 47%)          /* Gold/Yellow */
+
+/* Background Colors */
+--background: hsl(220 20% 8%)       /* Dark Background */
+--card: hsl(220 18% 12%)           /* Card Background */
+--muted: hsl(220 15% 20%)          /* Muted Elements */
+```
+
+## Custom CSS Variables
+Reference [index.css](mdc:src/index.css) for the complete design system:
+
+```css
+/* Competition Theme Variables */
+--hero-gradient: linear-gradient(135deg, hsl(348 83% 47%) 0%, hsl(263 70% 50%) 100%);
+--card-gradient: linear-gradient(180deg, hsl(220 18% 12%) 0%, hsl(220 18% 10%) 100%);
+--transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+```
+
+## Styling Conventions
+
+### 1. **Tailwind CSS First**
+- Use Tailwind utility classes for styling
+- Leverage the `cn()` utility from [utils.ts](mdc:src/lib/utils.ts) for class merging
+- Follow the established color system
+
+### 2. **Component Styling**
+- Use **CVA (Class Variance Authority)** for component variants
+- Reference [button.tsx](mdc:src/components/ui/button.tsx) for pattern
+- Apply `transition-smooth` for animations
+
+### 3. **Layout Patterns**
+```tsx
+// Hero sections use hero-gradient
+<section className="hero-gradient py-20">
+
+// Cards use card-gradient with borders
+<Card className="card-gradient border-border/50">
+
+// Use backdrop-blur for glass effects
+<div className="backdrop-blur-sm bg-white/10">
+```
+
+### 4. **Responsive Design**
+- Mobile-first approach with Tailwind breakpoints
+- Use `container mx-auto px-4` for consistent spacing
+- Grid layouts: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+
+### 5. **Animation Guidelines**
+- Use `transition-smooth` for consistent animations
+- Apply `hover:` states for interactive elements
+- Use `group` classes for coordinated hover effects
+
+## Component Styling Examples
+
+### Hero Components
+```tsx
+// Main hero with gradient background
+<section className="hero-gradient py-20 px-4">
+  <div className="text-glow"> {/* Text with glow effect */}
+```
+
+### Card Components
+```tsx
+// Contestant cards with hover effects
+<Card className="card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
+```
+
+### Button Variants
+```tsx
+// Primary buttons with shadow effects
+<Button className="shadow-lg shadow-primary/20 transition-smooth">
+// Outline buttons with hover states
+<Button variant="outline" className="hover:border-primary/50">
+```
+
+## Accessibility Considerations
+- Use semantic HTML elements
+- Leverage Radix UI components for accessibility
+- Ensure proper color contrast ratios
+- Include focus states for keyboard navigation
+
+## Performance Tips
+- Use CSS variables for theming
+- Minimize custom CSS in favor of Tailwind utilities
+- Leverage Tailwind's purging for smaller bundle sizes
+- Use `backdrop-blur` sparingly for performance

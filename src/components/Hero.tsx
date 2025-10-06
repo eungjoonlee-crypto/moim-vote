@@ -1,0 +1,47 @@
+import { Music, LogIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
+export const Hero = () => {
+  return (
+    <section className="relative overflow-hidden hero-gradient py-20 px-4">
+      <div className="absolute top-4 right-4 z-20">
+        <Link to="/auth">
+          <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm">
+            <LogIn className="w-4 h-4 mr-2" />
+            로그인 / 회원가입
+          </Button>
+        </Link>
+      </div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
+      
+      <div className="container mx-auto max-w-6xl relative z-10">
+        <div className="text-center space-y-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm mb-4">
+            <Music className="w-10 h-10 text-white" />
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black text-white text-glow">
+            Voice of Tomorrow
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium">
+            예선 투표에 참여하고 최고의 목소리를 선택하세요
+          </p>
+          
+          <div className="flex items-center justify-center gap-8 pt-4">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-accent">12</div>
+              <div className="text-sm text-white/70">참가자</div>
+            </div>
+            <div className="h-12 w-px bg-white/20" />
+            <div className="text-center">
+              <div className="text-4xl font-bold text-accent">D-7</div>
+              <div className="text-sm text-white/70">투표 마감</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};

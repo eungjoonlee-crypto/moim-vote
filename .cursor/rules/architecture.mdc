@@ -1,0 +1,55 @@
+---
+alwaysApply: true
+---
+# 🏗️ Architecture & Project Structure
+
+## Project Overview
+This is a **Voice Competition Voting Platform** built with modern React ecosystem. The project follows a component-based architecture with clear separation of concerns.
+
+## Core Technologies
+- **Frontend**: Vite + React 18 + TypeScript
+- **UI System**: shadcn/ui + Radix UI + Tailwind CSS
+- **Backend**: Supabase (Auth + Database)
+- **State Management**: TanStack Query + React Hook Form
+- **Routing**: React Router DOM
+
+## Directory Structure
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── Hero.tsx        # Main hero section
+│   └── ContestantCard.tsx # Contestant card component
+├── pages/              # Page components
+│   ├── Index.tsx       # Main voting page
+│   ├── Auth.tsx        # Authentication page
+│   └── NotFound.tsx    # 404 page
+├── hooks/              # Custom React hooks
+├── integrations/       # External service integrations
+│   └── supabase/       # Supabase configuration
+├── lib/                # Utility functions
+└── App.tsx             # Main app component
+```
+
+## Key Files
+- [App.tsx](mdc:src/App.tsx) - Main application component with routing
+- [Index.tsx](mdc:src/pages/Index.tsx) - Main voting page with contestant grid
+- [Auth.tsx](mdc:src/pages/Auth.tsx) - Authentication with social login
+- [client.ts](mdc:src/integrations/supabase/client.ts) - Supabase client configuration
+
+## Architecture Principles
+1. **Component-First**: Build reusable, composable components
+2. **Type Safety**: Use TypeScript interfaces for all props and data
+3. **Separation of Concerns**: Keep UI, logic, and data layers separate
+4. **Modern React Patterns**: Use hooks, functional components, and proper state management
+5. **Accessibility**: Leverage Radix UI for accessible components
+
+## Data Flow
+1. **Authentication**: Supabase Auth → React Context → Protected Routes
+2. **Voting Data**: Supabase Database → TanStack Query → UI Components
+3. **User Interactions**: Form Input → React Hook Form → Supabase API
+
+## Integration Points
+- **Supabase**: Authentication, database, real-time subscriptions
+- **YouTube**: Embedded video players for contestant performances
+- **Social Login**: Google OAuth, Kakao OAuth (configured but needs setup)
