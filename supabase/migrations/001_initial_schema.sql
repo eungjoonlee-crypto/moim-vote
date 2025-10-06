@@ -119,7 +119,7 @@ CREATE TRIGGER trigger_update_contestant_likes
   AFTER INSERT OR DELETE ON votes
   FOR EACH ROW EXECUTE FUNCTION update_contestant_likes();
 
--- 초기 참가자 데이터 삽입 (15명)
+-- 초기 참가자 데이터 삽입 (15명) - 검증된 YouTube 영상 ID 사용
 INSERT INTO contestants (name, song, youtube_url, views, likes) VALUES
   ('김민준', 'Can''t Help Falling in Love - Elvis Presley', 'https://www.youtube.com/watch?v=vGJTaP6anOU', 15420, 892),
   ('이서연', 'Someone Like You - Adele', 'https://www.youtube.com/watch?v=hLQl3WQQoQ0', 23150, 1456),

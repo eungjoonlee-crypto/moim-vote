@@ -58,6 +58,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   const [currentLikes, setCurrentLikes] = useState(likes);
   const [showVideo, setShowVideo] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState(false);
   const { toast } = useToast();
 
   // 썸네일 URL 생성
@@ -237,14 +238,40 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   return (
     <Card className="overflow-hidden card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
       <div className="aspect-video relative overflow-hidden bg-black">
-        {showVideo ? (
+        {showVideo && !videoError ? (
           <iframe
             src={`https://www.youtube.com/embed/${youtube_id}`}
             title={`${name} - ${song}`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="w-full h-full"
+            onError={() => {
+              setVideoError(true);
+              setShowVideo(false);
+              toast({
+                title: "영상 로드 실패",
+                description: "YouTube 영상을 불러올 수 없습니다.",
+                variant: "destructive",
+              });
+            }}
           />
+        ) : videoError ? (
+          <div className="w-full h-full flex items-center justify-center bg-gray-800">
+            <div className="text-center text-white">
+              <p className="text-lg font-semibold mb-2">영상을 불러올 수 없습니다</p>
+              <p className="text-sm text-gray-300 mb-4">영상이 삭제되었거나 비공개일 수 있습니다</p>
+              <Button
+                onClick={() => {
+                  setVideoError(false);
+                  setShowVideo(false);
+                }}
+                variant="outline"
+                className="text-white border-white hover:bg-white hover:text-black"
+              >
+                썸네일로 돌아가기
+              </Button>
+            </div>
+          </div>
         ) : (
           <div className="relative w-full h-full">
             {thumbnailUrl && (
