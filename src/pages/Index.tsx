@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Hero } from "@/components/Hero";
+import { useState as useReactState } from "react";
 import { ContestantCard } from "@/components/ContestantCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,8 +17,18 @@ interface Contestant {
   created_at: string;
 }
 
+interface SiteSettings {
+  id: string;
+  hero_title: string | null;
+  hero_subtitle: string | null;
+  hero_image_url: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
+}
+
 const Index = () => {
   const [contestants, setContestants] = useState<Contestant[]>([]);
+  const [siteSettings, setSiteSettings] = useReactState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -65,6 +76,49 @@ const Index = () => {
     };
 
     fetchContestants();
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('*')
+          .limit(1)
+          .single();
+        if (!error && data) {
+          setSiteSettings(data as SiteSettings);
+          // 동적으로 메타 태그 업데이트
+          const t = data.meta_title || '싱어게이 : 퀴어가수전';
+          const d = data.meta_description || '싱어게이 : 퀴어가수전 - 예선 투표에 참여하세요!';
+          document.title = t;
+          const ensureMeta = (name: string, content: string) => {
+            let el = document.querySelector(`meta[name=\"${name}\"]`) as HTMLMetaElement | null;
+            if (!el) {
+              el = document.createElement('meta');
+              el.setAttribute('name', name);
+              document.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+          };
+          ensureMeta('description', d);
+          const setOG = (property: string, content: string) => {
+            let el = document.querySelector(`meta[property=\"${property}\"]`) as HTMLMetaElement | null;
+            if (!el) {
+              el = document.createElement('meta');
+              el.setAttribute('property', property);
+              document.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+          };
+          setOG('og:title', t);
+          setOG('og:description', d);
+          if (data.hero_image_url) {
+            setOG('og:image', data.hero_image_url);
+          }
+        }
+      } catch (e) {
+        // 무시하고 기본 메타 사용
+      }
+    };
+    fetchSettings();
   }, []);
 
   if (loading) {
@@ -80,7 +134,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Hero />
+      <Hero 
+        title={siteSettings?.hero_title || undefined}
+        subtitle={siteSettings?.hero_subtitle || undefined}
+        heroImageUrl={siteSettings?.hero_image_url || undefined}
+      />
       
       <main className="container mx-auto px-4 py-16 max-w-7xl">
         <div className="mb-12">
