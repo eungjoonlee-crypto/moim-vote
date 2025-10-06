@@ -162,7 +162,7 @@ const Index = () => {
             참가자 무대
           </h2>
           <p className="text-muted-foreground text-lg">
-            각 참가자의 영상을 시청하고 응원 댓글을 남겨주세요
+            응원하는 참가자에게 투표하고, 댓글을 남겨주세요
           </p>
         </div>
 
