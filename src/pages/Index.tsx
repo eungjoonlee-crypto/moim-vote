@@ -12,6 +12,7 @@ interface Contestant {
   youtube_id: string;
   views: number;
   likes: number;
+  vote_count: number;
   created_at: string;
 }
 
@@ -98,6 +99,7 @@ const Index = () => {
                 youtube_id={contestant.youtube_id}
                 views={contestant.views}
                 likes={contestant.likes}
+                vote_count={contestant.vote_count}
               />
             ))}
           </div>

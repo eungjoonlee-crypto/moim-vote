@@ -48,14 +48,21 @@ interface ContestantCardProps {
   youtube_id: string;
   views: number;
   likes: number;
+  vote_count: number;
 }
 
-export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views, likes }: ContestantCardProps) => {
+export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views, likes, vote_count }: ContestantCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLiked, setIsLiked] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likes);
+  const [currentVoteCount, setCurrentVoteCount] = useState(vote_count);
+
+  // vote_count 변경 시 currentVoteCount 업데이트
+  useEffect(() => {
+    setCurrentVoteCount(vote_count);
+  }, [vote_count]);
   const [showVideo, setShowVideo] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
@@ -203,24 +210,26 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         if (error) throw error;
         
         setIsLiked(false);
-        setCurrentLikes(prev => prev - 1);
+        setCurrentVoteCount(prev => prev - 1);
         toast({
           title: "투표 취소",
           description: "투표를 취소했습니다.",
         });
       } else {
-        // 투표하기
+        // 투표하기 (upsert 사용으로 재투표 가능)
         const { error } = await supabase
           .from('votes')
-          .insert({
+          .upsert({
             user_id: user.id,
             contestant_id: id
+          }, {
+            onConflict: 'user_id,contestant_id'
           });
 
         if (error) throw error;
         
         setIsLiked(true);
-        setCurrentLikes(prev => prev + 1);
+        setCurrentVoteCount(prev => prev + 1);
         toast({
           title: "투표 완료!",
           description: "이 참가자에게 투표했습니다!",
@@ -312,26 +321,18 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
                 }}
               />
             )}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/10 transition-colors cursor-pointer"
+              onMouseEnter={() => setShowVideo(true)}
+              onMouseLeave={() => setShowVideo(false)}
+            >
               <div className="flex flex-col items-center space-y-3">
-                <div className="text-center text-white mb-2">
-                  <p className="text-sm font-medium">로컬 환경에서는</p>
-                  <p className="text-xs opacity-80">영상 재생이 제한될 수 있습니다</p>
-                </div>
                 <Button
                   onClick={() => window.open(`https://www.youtube.com/watch?v=${youtube_id}`, '_blank')}
                   size="lg"
                   className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
                 >
                   <Play className="w-8 h-8 ml-1" />
-                </Button>
-                <Button
-                  onClick={() => window.open(`https://www.youtube.com/watch?v=${youtube_id}`, '_blank')}
-                  size="sm"
-                  variant="outline"
-                  className="bg-black/50 border-white/50 text-white hover:bg-white/20 text-xs px-3 py-1"
-                >
-                  YouTube에서 보기
                 </Button>
               </div>
             </div>
@@ -353,6 +354,10 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
           <div className="flex items-center gap-2">
             <ThumbsUp className="w-4 h-4" />
             <span>{currentLikes.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Heart className="w-4 h-4" />
+            <span>{currentVoteCount.toLocaleString()}</span>
           </div>
         </div>
 
