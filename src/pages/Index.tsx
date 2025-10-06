@@ -35,7 +35,17 @@ const Index = () => {
         }
 
         console.log('Contestants data:', data);
-        setContestants(data || []);
+        
+        // 참가자 순서를 랜덤으로 섞기 (Fisher-Yates 셔플 알고리즘)
+        const contestants = data || [];
+        const shuffledContestants = [...contestants];
+        
+        for (let i = shuffledContestants.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledContestants[i], shuffledContestants[j]] = [shuffledContestants[j], shuffledContestants[i]];
+        }
+        
+        setContestants(shuffledContestants);
       } catch (error) {
         console.error('Error:', error);
         toast.error('오류가 발생했습니다.');
