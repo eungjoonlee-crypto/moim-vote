@@ -78,25 +78,22 @@ const Index = () => {
       }
     };
 
-    fetchContestants();
-    // 유튜브 통계 주기 동기화 (10분 간격)
-    const stop = startPeriodicSync(10);
-    
-    return () => {
-      stop && stop();
-    };
     const fetchSettings = async () => {
       try {
         const { data, error } = await supabase
           .from('site_settings')
           .select('*')
-          .limit(1)
-          .single();
-        if (!error && data) {
-          setSiteSettings(data as SiteSettings);
+          .order('updated_at', { ascending: false })
+          .limit(1);
+        if (error) {
+          console.warn('site_settings fetch error:', error.message);
+        }
+        const row = Array.isArray(data) ? (data[0] as SiteSettings | undefined) : undefined;
+        if (row) {
+          setSiteSettings(row);
           // 동적으로 메타 태그 업데이트
-          const t = data.meta_title || '싱어게이 : 퀴어가수전';
-          const d = data.meta_description || '싱어게이 : 퀴어가수전 - 예선 투표에 참여하세요!';
+          const t = row.meta_title || '싱어게이 : 퀴어가수전';
+          const d = row.meta_description || '싱어게이 : 퀴어가수전 - 예선 투표에 참여하세요!';
           document.title = t;
           const ensureMeta = (name: string, content: string) => {
             let el = document.querySelector(`meta[name=\"${name}\"]`) as HTMLMetaElement | null;
@@ -119,15 +116,23 @@ const Index = () => {
           };
           setOG('og:title', t);
           setOG('og:description', d);
-          if (data.hero_image_url) {
-            setOG('og:image', data.hero_image_url);
+          if (row.hero_image_url) {
+            setOG('og:image', row.hero_image_url);
           }
         }
       } catch (e) {
         // 무시하고 기본 메타 사용
       }
     };
+    // 실행 순서: 참가자 → 설정 로드 → 주기 동기화 시작
+    fetchContestants();
     fetchSettings();
+    // 유튜브 통계 주기 동기화 (10분 간격)
+    const stop = startPeriodicSync(10);
+
+    return () => {
+      stop && stop();
+    };
   }, []);
 
   if (loading) {
