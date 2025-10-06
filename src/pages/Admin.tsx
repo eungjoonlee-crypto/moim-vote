@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Save, X, Plus, Trash2, ExternalLink, Play } from "lucide-react";
+import { Edit, Save, X, Plus, Trash2, ExternalLink, Play, RefreshCw, Sync, Settings } from "lucide-react";
 import { extractVideoId, isValidYouTubeUrl, getThumbnailUrlFromLink } from "@/lib/youtube";
+import { syncAllContestantsVideoInfo, getYouTubeVideoInfo } from "@/lib/youtube-api";
+import { useAutoSync } from "@/hooks/useAutoSync";
 
 interface Contestant {
   id: string;
@@ -39,7 +41,12 @@ const Admin = () => {
     likes: 0
   });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
   const { toast } = useToast();
+
+  // 자동 동기화 활성화 (30분마다)
+  useAutoSync(30, autoSyncEnabled);
 
   useEffect(() => {
     fetchContestants();
@@ -197,6 +204,72 @@ const Admin = () => {
     }
   };
 
+  const handleSyncAll = async () => {
+    setSyncing(true);
+    try {
+      const success = await syncAllContestantsVideoInfo();
+      if (success) {
+        await fetchContestants();
+        toast({
+          title: "동기화 완료",
+          description: "모든 참가자의 YouTube 데이터가 동기화되었습니다.",
+        });
+      } else {
+        toast({
+          title: "동기화 실패",
+          description: "YouTube 데이터 동기화에 실패했습니다.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "동기화 오류",
+        description: error.message || "동기화 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncSingle = async (contestant: Contestant) => {
+    if (!contestant.youtube_id) return;
+
+    try {
+      const videoInfo = await getYouTubeVideoInfo(contestant.youtube_id);
+      if (videoInfo) {
+        const { error } = await supabase
+          .from('contestants')
+          .update({
+            views: videoInfo.viewCount,
+            likes: videoInfo.likeCount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', contestant.id);
+
+        if (error) throw error;
+
+        await fetchContestants();
+        toast({
+          title: "동기화 완료",
+          description: `${contestant.name}의 데이터가 동기화되었습니다.`,
+        });
+      } else {
+        toast({
+          title: "동기화 실패",
+          description: "YouTube 데이터를 가져올 수 없습니다.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "동기화 오류",
+        description: error.message || "동기화 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -212,12 +285,38 @@ const Admin = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            🎵 관리자 페이지
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            참가자 정보를 관리하고 YouTube 영상 링크를 수정할 수 있습니다.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-foreground mb-4">
+                🎵 관리자 페이지
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                참가자 정보를 관리하고 YouTube 영상 링크를 수정할 수 있습니다.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSyncAll}
+                disabled={syncing}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {syncing ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Sync className="w-4 h-4 mr-2" />
+                )}
+                {syncing ? "동기화 중..." : "전체 동기화"}
+              </Button>
+              <Button
+                onClick={() => setAutoSyncEnabled(!autoSyncEnabled)}
+                variant="outline"
+                className={autoSyncEnabled ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                {autoSyncEnabled ? "자동 동기화 ON" : "자동 동기화 OFF"}
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* 참가자 추가 폼 */}
@@ -409,7 +508,7 @@ const Admin = () => {
                       <span>조회수: {contestant.views.toLocaleString()}</span>
                       <span>좋아요: {contestant.likes.toLocaleString()}</span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button 
                         onClick={() => handleEdit(contestant)} 
                         size="sm" 
@@ -417,6 +516,15 @@ const Admin = () => {
                       >
                         <Edit className="w-4 h-4 mr-2" />
                         수정
+                      </Button>
+                      <Button 
+                        onClick={() => handleSyncSingle(contestant)} 
+                        size="sm" 
+                        variant="outline"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Sync className="w-4 h-4 mr-2" />
+                        동기화
                       </Button>
                       <Button 
                         onClick={() => handleDelete(contestant.id)} 
