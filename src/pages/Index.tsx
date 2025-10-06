@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { useState as useReactState } from "react";
 import { ContestantCard } from "@/components/ContestantCard";
 import { supabase } from "@/integrations/supabase/client";
+import { startPeriodicSync } from "@/lib/youtube-api";
 import { toast } from "sonner";
 
 interface Contestant {
@@ -78,6 +79,12 @@ const Index = () => {
     };
 
     fetchContestants();
+    // 유튜브 통계 주기 동기화 (10분 간격)
+    const stop = startPeriodicSync(10);
+    
+    return () => {
+      stop && stop();
+    };
     const fetchSettings = async () => {
       try {
         const { data, error } = await supabase

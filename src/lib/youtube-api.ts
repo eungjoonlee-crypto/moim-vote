@@ -18,27 +18,36 @@ interface YouTubeVideoInfo {
  */
 export const getYouTubeVideoInfo = async (videoId: string): Promise<YouTubeVideoInfo | null> => {
   try {
-    // 실제 구현에서는 YouTube Data API v3를 사용합니다.
-    // 여기서는 더미 데이터를 반환하되, 실제 API 호출 구조를 보여줍니다.
-    
-    // 실제 API 호출 예시:
-    // const response = await fetch(
-    //   `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet,statistics,contentDetails&key=${YOUTUBE_API_KEY}`
-    // );
-    // const data = await response.json();
-    
-    // 더미 데이터 (실제 API 응답 구조)
-    const mockData = {
-      title: `YouTube Video ${videoId}`,
-      viewCount: Math.floor(Math.random() * 1000000) + 10000,
-      likeCount: Math.floor(Math.random() * 10000) + 100,
-      thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-      publishedAt: new Date().toISOString(),
-      duration: 'PT3M30S',
-      channelTitle: 'Voice of Tomorrow'
+    const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+    if (!apiKey) {
+      console.warn('VITE_YOUTUBE_API_KEY not set. Skipping live fetch.');
+      return null;
+    }
+
+    const url = `https://www.googleapis.com/youtube/v3/videos?id=${encodeURIComponent(
+      videoId
+    )}&part=snippet,statistics,contentDetails&key=${apiKey}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error('YouTube API error status:', response.status, await response.text());
+      return null;
+    }
+    const data = await response.json();
+    const item = data.items?.[0];
+    if (!item) return null;
+
+    const info: YouTubeVideoInfo = {
+      title: item.snippet?.title ?? '',
+      viewCount: Number(item.statistics?.viewCount ?? 0),
+      likeCount: Number(item.statistics?.likeCount ?? 0),
+      thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      publishedAt: item.snippet?.publishedAt ?? '',
+      duration: item.contentDetails?.duration ?? '',
+      channelTitle: item.snippet?.channelTitle ?? ''
     };
 
-    return mockData;
+    return info;
   } catch (error) {
     console.error('Error fetching YouTube video info:', error);
     return null;
