@@ -77,17 +77,10 @@ const Auth = () => {
   };
 
   const handleKakaoLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "kakao",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      toast.error(error.message || "Kakao 로그인 중 오류가 발생했습니다.");
-    }
+    toast({
+      title: "카카오톡 로그인 설정 중",
+      description: "카카오톡 OAuth 설정이 완료되면 사용할 수 있습니다.",
+    });
   };
 
   return (
@@ -187,6 +180,7 @@ const Auth = () => {
               variant="outline"
               className="w-full bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#000000] border-[#FEE500]"
               onClick={handleKakaoLogin}
+              disabled
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
@@ -194,7 +188,7 @@ const Auth = () => {
                   d="M12 3C6.477 3 2 6.477 2 10.5c0 2.442 1.62 4.588 4.058 5.858l-1.036 3.82c-.066.244.188.442.398.31l4.19-2.642c.458.054.926.083 1.39.083 5.523 0 10-3.477 10-7.5S17.523 3 12 3z"
                 />
               </svg>
-              카카오로 계속하기
+              카카오로 계속하기 (설정 중)
             </Button>
           </div>
 
