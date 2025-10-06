@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Comment {
-  id: string;
   author: string;
   text: string;
   timestamp: Date;
@@ -66,8 +65,7 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
       }
 
       const formattedComments = data?.map(comment => ({
-        id: comment.id,
-        author: comment.user_id ? '사용자' : '익명', // ID 정보 제외하고 간단하게 표시
+        author: comment.user_id ? '사용자' : '익명', // ID 정보 완전 제외
         text: comment.content,
         timestamp: new Date(comment.created_at)
       })) || [];
@@ -121,9 +119,8 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
 
       if (error) throw error;
 
-      // 즉시 화면에 댓글 추가 (ID 정보 제외)
+      // 즉시 화면에 댓글 추가 (ID 정보 완전 제외)
       const newCommentObj = {
-        id: Date.now().toString(), // 임시 ID
         author: user.email?.split('@')[0] || '익명', // 이메일에서 사용자명 추출
         text: newComment,
         timestamp: new Date()
@@ -270,9 +267,9 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
             {comments.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">댓글 {comments.length}</h4>
-                {comments.map((comment) => (
+                {comments.map((comment, index) => (
                   <div
-                    key={comment.id}
+                    key={`comment-${index}`}
                     className="bg-muted/30 rounded-lg p-3 space-y-1"
                   >
                     <div className="flex items-center justify-between">
