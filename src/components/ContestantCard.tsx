@@ -56,10 +56,7 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
     const fetchComments = async () => {
       const { data, error } = await supabase
         .from('comments')
-        .select(`
-          *,
-          user_profiles!inner(display_name)
-        `)
+        .select('*')
         .eq('contestant_id', id)
         .order('created_at', { ascending: false });
 
@@ -70,7 +67,7 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
 
       const formattedComments = data?.map(comment => ({
         id: comment.id,
-        author: comment.user_profiles?.display_name || '익명',
+        author: comment.user_id ? '사용자' : '익명', // ID 정보 제외하고 간단하게 표시
         text: comment.content,
         timestamp: new Date(comment.created_at)
       })) || [];
@@ -124,27 +121,17 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
 
       if (error) throw error;
 
-      // 댓글 목록 새로고침
-      const { data, error: fetchError } = await supabase
-        .from('comments')
-        .select(`
-          *,
-          user_profiles!inner(display_name)
-        `)
-        .eq('contestant_id', id)
-        .order('created_at', { ascending: false });
-
-      if (!fetchError && data) {
-        const formattedComments = data.map(comment => ({
-          id: comment.id,
-          author: comment.user_profiles?.display_name || '익명',
-          text: comment.content,
-          timestamp: new Date(comment.created_at)
-        }));
-        setComments(formattedComments);
-      }
-
+      // 즉시 화면에 댓글 추가 (ID 정보 제외)
+      const newCommentObj = {
+        id: Date.now().toString(), // 임시 ID
+        author: user.email?.split('@')[0] || '익명', // 이메일에서 사용자명 추출
+        text: newComment,
+        timestamp: new Date()
+      };
+      
+      setComments(prev => [newCommentObj, ...prev]);
       setNewComment("");
+      
       toast({
         title: "댓글 작성 완료",
         description: "댓글이 성공적으로 작성되었습니다.",
