@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Heart, Share2, MessageCircle, Eye, ThumbsUp, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -58,6 +58,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   const [isLiked, setIsLiked] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likes);
   const [currentVoteCount, setCurrentVoteCount] = useState(vote_count);
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   // vote_count 변경 시 currentVoteCount 업데이트
   useEffect(() => {
@@ -73,6 +74,31 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     const thumbnail = getThumbnailUrlFromLink(youtube_url, 'high');
     setThumbnailUrl(thumbnail);
   }, [youtube_url]);
+
+  // 모바일에서 카드가 뷰포트에 보이면 자동 재생, 사라지면 정지
+  useEffect(() => {
+    const isMobile = typeof window !== 'undefined' && (
+      window.matchMedia('(pointer: coarse)').matches || /Mobi|Android/i.test(navigator.userAgent)
+    );
+    if (!isMobile) return;
+    if (!cardRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShowVideo(true);
+          } else {
+            setShowVideo(false);
+          }
+        });
+      },
+      { root: null, rootMargin: '0px', threshold: 0.6 }
+    );
+
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // 사용자 투표 상태 확인
   useEffect(() => {
@@ -246,10 +272,10 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
 
   return (
     <Card className="overflow-hidden card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
-      <div className="aspect-video relative overflow-hidden bg-black">
+      <div ref={cardRef} className="aspect-video relative overflow-hidden bg-black">
         {showVideo && !videoError ? (
           <iframe
-            src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1`}
+            src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1`}
             title={`${name} - ${song}`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
