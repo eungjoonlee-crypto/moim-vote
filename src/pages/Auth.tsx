@@ -11,6 +11,7 @@ const Auth = () => {
   const [isLogin] = useState(true);
   // 이메일/비밀번호 회원가입/로그인은 사용하지 않음
   const [loading, setLoading] = useState(false);
+  const redirectTo = `${(import.meta as any).env?.VITE_SITE_URL || window.location.origin}/`;
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -35,7 +36,10 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo,
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       });
       if (error) throw error;
@@ -49,7 +53,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "kakao",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo,
         },
       });
       if (error) throw error;
