@@ -240,11 +240,12 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
       <div className="aspect-video relative overflow-hidden bg-black">
         {showVideo && !videoError ? (
           <iframe
-            src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}`}
+            src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1`}
             title={`${name} - ${song}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             className="w-full h-full"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
             onLoad={() => {
               // iframe이 로드되었지만 실제로는 오류일 수 있음
               setTimeout(() => {
@@ -258,7 +259,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
                     variant: "destructive",
                   });
                 }
-              }, 2000);
+              }, 3000);
             }}
             onError={() => {
               setVideoError(true);
