@@ -1,58 +1,60 @@
+import { useState, useEffect } from "react";
 import { Hero } from "@/components/Hero";
 import { ContestantCard } from "@/components/ContestantCard";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-const contestants = [
-  {
-    id: "1",
-    name: "김민준",
-    song: "Can't Help Falling in Love - Elvis Presley",
-    youtubeId: "vGJTaP6anOU",
-    views: 15420,
-    likes: 892,
-  },
-  {
-    id: "2",
-    name: "이서연",
-    song: "Someone Like You - Adele",
-    youtubeId: "hLQl3WQQoQ0",
-    views: 23150,
-    likes: 1456,
-  },
-  {
-    id: "3",
-    name: "박준호",
-    song: "I Will Always Love You - Whitney Houston",
-    youtubeId: "3JWTaaS7LdU",
-    views: 18730,
-    likes: 1124,
-  },
-  {
-    id: "4",
-    name: "최유나",
-    song: "Shallow - Lady Gaga & Bradley Cooper",
-    youtubeId: "bo_efYhYU2A",
-    views: 31240,
-    likes: 2103,
-  },
-  {
-    id: "5",
-    name: "정태양",
-    song: "Bohemian Rhapsody - Queen",
-    youtubeId: "fJ9rUzIMcZQ",
-    views: 27890,
-    likes: 1876,
-  },
-  {
-    id: "6",
-    name: "강하늘",
-    song: "All of Me - John Legend",
-    youtubeId: "450p7goxZqg",
-    views: 19560,
-    likes: 1289,
-  },
-];
+interface Contestant {
+  id: string;
+  name: string;
+  song: string;
+  youtube_id: string;
+  views: number;
+  likes: number;
+  created_at: string;
+}
 
 const Index = () => {
+  const [contestants, setContestants] = useState<Contestant[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContestants = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('contestants')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching contestants:', error);
+          toast.error('참가자 정보를 불러오는데 실패했습니다.');
+          return;
+        }
+
+        setContestants(data || []);
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContestants();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">참가자 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Hero />
@@ -67,11 +69,25 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {contestants.map((contestant) => (
-            <ContestantCard key={contestant.id} {...contestant} />
-          ))}
-        </div>
+        {contestants.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-lg">아직 참가자가 없습니다.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {contestants.map((contestant) => (
+              <ContestantCard 
+                key={contestant.id} 
+                id={contestant.id}
+                name={contestant.name}
+                song={contestant.song}
+                youtubeId={contestant.youtube_id}
+                views={contestant.views}
+                likes={contestant.likes}
+              />
+            ))}
+          </div>
+        )}
       </main>
 
       <footer className="border-t border-border/50 mt-20">
