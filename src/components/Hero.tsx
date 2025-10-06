@@ -9,9 +9,11 @@ interface HeroProps {
   title?: string;
   subtitle?: string;
   heroImageUrl?: string; // background image url
+  contestantCount?: number;
+  daysLeft?: number;
 }
 
-export const Hero = ({ title, subtitle, heroImageUrl }: HeroProps) => {
+export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft }: HeroProps) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -109,12 +111,12 @@ export const Hero = ({ title, subtitle, heroImageUrl }: HeroProps) => {
           
           <div className="flex items-center justify-center gap-8 pt-4">
             <div className="text-center">
-              <div className="text-4xl font-bold text-accent">15</div>
+              <div className="text-4xl font-bold text-accent">{typeof contestantCount === 'number' ? contestantCount : 15}</div>
               <div className="text-sm text-white/70">참가자</div>
             </div>
             <div className="h-12 w-px bg-white/20" />
             <div className="text-center">
-              <div className="text-4xl font-bold text-accent">D-7</div>
+              <div className="text-4xl font-bold text-accent">{typeof daysLeft === 'number' ? `D-${daysLeft}` : 'D-7'}</div>
               <div className="text-sm text-white/70">투표 마감</div>
             </div>
           </div>

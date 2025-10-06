@@ -22,6 +22,8 @@ interface SiteSettings {
   hero_title: string | null;
   hero_subtitle: string | null;
   hero_image_url: string | null;
+  hero_contestant_count: number | null;
+  hero_days_left: number | null;
   meta_title: string | null;
   meta_description: string | null;
 }
@@ -138,6 +140,8 @@ const Index = () => {
         title={siteSettings?.hero_title || undefined}
         subtitle={siteSettings?.hero_subtitle || undefined}
         heroImageUrl={siteSettings?.hero_image_url || undefined}
+        contestantCount={siteSettings?.hero_contestant_count ?? undefined}
+        daysLeft={siteSettings?.hero_days_left ?? undefined}
       />
       
       <main className="container mx-auto px-4 py-16 max-w-7xl">
