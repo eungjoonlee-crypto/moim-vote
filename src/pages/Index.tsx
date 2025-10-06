@@ -22,6 +22,7 @@ const Index = () => {
   useEffect(() => {
     const fetchContestants = async () => {
       try {
+        console.log('Fetching contestants...');
         const { data, error } = await supabase
           .from('contestants')
           .select('*')
@@ -33,6 +34,7 @@ const Index = () => {
           return;
         }
 
+        console.log('Contestants data:', data);
         setContestants(data || []);
       } catch (error) {
         console.error('Error:', error);
