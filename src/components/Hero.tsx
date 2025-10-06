@@ -82,7 +82,11 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
             </Button>
           </div>
         ) : (
-          <a href="/auth" className="inline-flex">
+          <a
+            href={`${(import.meta as any).env?.VITE_SITE_URL || window.location.origin}/auth`}
+            className="inline-flex"
+            rel="noopener noreferrer"
+          >
             <Button
               size="lg"
               className="rounded-full px-5 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/60 focus:outline-none"

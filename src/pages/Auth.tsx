@@ -11,7 +11,8 @@ const Auth = () => {
   const [isLogin] = useState(true);
   // 이메일/비밀번호 회원가입/로그인은 사용하지 않음
   const [loading, setLoading] = useState(false);
-  const redirectTo = `${(import.meta as any).env?.VITE_SITE_URL || window.location.origin}/`;
+  const origin = (import.meta as any).env?.VITE_SITE_URL || window.location.origin;
+  const redirectTo = `${origin}/`;
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -39,6 +40,8 @@ const Auth = () => {
           redirectTo,
           queryParams: {
             prompt: 'select_account',
+            // iOS 외부 브라우저 신뢰 대상
+            origin,
           },
         },
       });
