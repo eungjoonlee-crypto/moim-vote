@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Save, X, Plus, Trash2, ExternalLink, Play, RefreshCw, Sync, Settings } from "lucide-react";
+import { Edit, Save, X, Plus, Trash2, ExternalLink, Play, RefreshCw, RotateCcw, Settings } from "lucide-react";
 import { extractVideoId, isValidYouTubeUrl, getThumbnailUrlFromLink } from "@/lib/youtube";
 import { syncAllContestantsVideoInfo, getYouTubeVideoInfo } from "@/lib/youtube-api";
 import { useAutoSync } from "@/hooks/useAutoSync";
@@ -303,7 +303,7 @@ const Admin = () => {
                 {syncing ? (
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
-                  <Sync className="w-4 h-4 mr-2" />
+                  <RotateCcw className="w-4 h-4 mr-2" />
                 )}
                 {syncing ? "동기화 중..." : "전체 동기화"}
               </Button>
@@ -523,7 +523,7 @@ const Admin = () => {
                         variant="outline"
                         className="bg-green-600 hover:bg-green-700 text-white"
                       >
-                        <Sync className="w-4 h-4 mr-2" />
+                        <RotateCcw className="w-4 h-4 mr-2" />
                         동기화
                       </Button>
                       <Button 
