@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Save, X, Plus, Trash2 } from "lucide-react";
+import { Edit, Save, X, Plus, Trash2, ExternalLink } from "lucide-react";
+import { extractVideoId, isValidYouTubeUrl } from "@/lib/youtube";
 
 interface Contestant {
   id: string;
   name: string;
   song: string;
+  youtube_url: string;
   youtube_id: string;
   views: number;
   likes: number;
@@ -25,14 +27,14 @@ const Admin = () => {
   const [editForm, setEditForm] = useState({
     name: "",
     song: "",
-    youtube_id: "",
+    youtube_url: "",
     views: 0,
     likes: 0
   });
   const [newContestant, setNewContestant] = useState({
     name: "",
     song: "",
-    youtube_id: "",
+    youtube_url: "",
     views: 0,
     likes: 0
   });
@@ -68,7 +70,7 @@ const Admin = () => {
     setEditForm({
       name: contestant.name,
       song: contestant.song,
-      youtube_id: contestant.youtube_id,
+      youtube_url: contestant.youtube_url,
       views: contestant.views,
       likes: contestant.likes
     });
@@ -76,6 +78,16 @@ const Admin = () => {
 
   const handleSave = async () => {
     if (!editingId) return;
+
+    // YouTube URL 유효성 검사
+    if (!isValidYouTubeUrl(editForm.youtube_url)) {
+      toast({
+        title: "YouTube URL 오류",
+        description: "유효한 YouTube 링크를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -105,17 +117,27 @@ const Admin = () => {
     setEditForm({
       name: "",
       song: "",
-      youtube_id: "",
+      youtube_url: "",
       views: 0,
       likes: 0
     });
   };
 
   const handleAdd = async () => {
-    if (!newContestant.name || !newContestant.song || !newContestant.youtube_id) {
+    if (!newContestant.name || !newContestant.song || !newContestant.youtube_url) {
       toast({
         title: "입력 오류",
-        description: "이름, 곡명, YouTube ID는 필수입니다.",
+        description: "이름, 곡명, YouTube URL은 필수입니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // YouTube URL 유효성 검사
+    if (!isValidYouTubeUrl(newContestant.youtube_url)) {
+      toast({
+        title: "YouTube URL 오류",
+        description: "유효한 YouTube 링크를 입력해주세요.",
         variant: "destructive",
       });
       return;
@@ -132,7 +154,7 @@ const Admin = () => {
       setNewContestant({
         name: "",
         song: "",
-        youtube_id: "",
+        youtube_url: "",
         views: 0,
         likes: 0
       });
@@ -229,13 +251,24 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="new-youtube">YouTube ID</Label>
+                    <Label htmlFor="new-youtube">YouTube URL</Label>
                     <Input
                       id="new-youtube"
-                      value={newContestant.youtube_id}
-                      onChange={(e) => setNewContestant(prev => ({ ...prev, youtube_id: e.target.value }))}
-                      placeholder="YouTube 영상 ID"
+                      value={newContestant.youtube_url}
+                      onChange={(e) => setNewContestant(prev => ({ ...prev, youtube_url: e.target.value }))}
+                      placeholder="https://www.youtube.com/watch?v=..."
                     />
+                    {newContestant.youtube_url && isValidYouTubeUrl(newContestant.youtube_url) && (
+                      <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                        <ExternalLink className="w-4 h-4" />
+                        유효한 YouTube 링크입니다
+                      </div>
+                    )}
+                    {newContestant.youtube_url && !isValidYouTubeUrl(newContestant.youtube_url) && (
+                      <div className="mt-2 text-sm text-red-600">
+                        유효하지 않은 YouTube 링크입니다
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="new-views">조회수</Label>
@@ -301,12 +334,24 @@ const Admin = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor={`edit-youtube-${contestant.id}`}>YouTube ID</Label>
+                      <Label htmlFor={`edit-youtube-${contestant.id}`}>YouTube URL</Label>
                       <Input
                         id={`edit-youtube-${contestant.id}`}
-                        value={editForm.youtube_id}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, youtube_id: e.target.value }))}
+                        value={editForm.youtube_url}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, youtube_url: e.target.value }))}
+                        placeholder="https://www.youtube.com/watch?v=..."
                       />
+                      {editForm.youtube_url && isValidYouTubeUrl(editForm.youtube_url) && (
+                        <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                          <ExternalLink className="w-4 h-4" />
+                          유효한 YouTube 링크입니다
+                        </div>
+                      )}
+                      {editForm.youtube_url && !isValidYouTubeUrl(editForm.youtube_url) && (
+                        <div className="mt-2 text-sm text-red-600">
+                          유효하지 않은 YouTube 링크입니다
+                        </div>
+                      )}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>

@@ -6,7 +6,16 @@ CREATE TABLE IF NOT EXISTS contestants (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   song TEXT NOT NULL,
-  youtube_id TEXT NOT NULL,
+  youtube_url TEXT NOT NULL,
+  youtube_id TEXT GENERATED ALWAYS AS (
+    CASE 
+      WHEN youtube_url ~ 'youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})' THEN 
+        (regexp_match(youtube_url, 'youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})'))[1]
+      WHEN youtube_url ~ 'youtu\.be/([a-zA-Z0-9_-]{11})' THEN 
+        (regexp_match(youtube_url, 'youtu\.be/([a-zA-Z0-9_-]{11})'))[1]
+      ELSE NULL
+    END
+  ) STORED,
   views INTEGER DEFAULT 0,
   likes INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -111,19 +120,19 @@ CREATE TRIGGER trigger_update_contestant_likes
   FOR EACH ROW EXECUTE FUNCTION update_contestant_likes();
 
 -- 초기 참가자 데이터 삽입 (15명)
-INSERT INTO contestants (name, song, youtube_id, views, likes) VALUES
-  ('김민준', 'Can''t Help Falling in Love - Elvis Presley', 'vGJTaP6anOU', 15420, 892),
-  ('이서연', 'Someone Like You - Adele', 'hLQl3WQQoQ0', 23150, 1456),
-  ('박준호', 'I Will Always Love You - Whitney Houston', '3JWTaaS7LdU', 18730, 1124),
-  ('최유나', 'Shallow - Lady Gaga & Bradley Cooper', 'bo_efYhYU2A', 31240, 2103),
-  ('정태양', 'Bohemian Rhapsody - Queen', 'fJ9rUzIMcZQ', 27890, 1876),
-  ('강하늘', 'All of Me - John Legend', '450p7goxZqg', 19560, 1289),
-  ('윤지호', 'Shape of You - Ed Sheeran', 'JGwWNGJdvx8', 28940, 1923),
-  ('한소영', 'Rolling in the Deep - Adele', 'rYEDA3JcQqw', 25670, 1687),
-  ('조민수', 'Perfect - Ed Sheeran', '2Vv-BfVoq4g', 32450, 2156),
-  ('임다은', 'Hello - Adele', 'YQHsXMglC9A', 29830, 1987),
-  ('송재현', 'Thinking Out Loud - Ed Sheeran', 'lp-EO5I60KA', 26780, 1754),
-  ('김예린', 'When We Were Young - Adele', 'DDWKuo3gXMQ', 31290, 2089),
-  ('이동현', 'Photograph - Ed Sheeran', 'nSDgHBxUbVQ', 28450, 1892),
-  ('박지민', 'Set Fire to the Rain - Adele', 'RAz8FmiZYL8', 30120, 2013),
-  ('최현우', 'Castle on the Hill - Ed Sheeran', 'K0ibBPhiaG0', 27560, 1834);
+INSERT INTO contestants (name, song, youtube_url, views, likes) VALUES
+  ('김민준', 'Can''t Help Falling in Love - Elvis Presley', 'https://www.youtube.com/watch?v=vGJTaP6anOU', 15420, 892),
+  ('이서연', 'Someone Like You - Adele', 'https://www.youtube.com/watch?v=hLQl3WQQoQ0', 23150, 1456),
+  ('박준호', 'I Will Always Love You - Whitney Houston', 'https://www.youtube.com/watch?v=3JWTaaS7LdU', 18730, 1124),
+  ('최유나', 'Shallow - Lady Gaga & Bradley Cooper', 'https://www.youtube.com/watch?v=bo_efYhYU2A', 31240, 2103),
+  ('정태양', 'Bohemian Rhapsody - Queen', 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ', 27890, 1876),
+  ('강하늘', 'All of Me - John Legend', 'https://www.youtube.com/watch?v=450p7goxZqg', 19560, 1289),
+  ('윤지호', 'Shape of You - Ed Sheeran', 'https://www.youtube.com/watch?v=JGwWNGJdvx8', 28940, 1923),
+  ('한소영', 'Rolling in the Deep - Adele', 'https://www.youtube.com/watch?v=rYEDA3JcQqw', 25670, 1687),
+  ('조민수', 'Perfect - Ed Sheeran', 'https://www.youtube.com/watch?v=2Vv-BfVoq4g', 32450, 2156),
+  ('임다은', 'Hello - Adele', 'https://www.youtube.com/watch?v=YQHsXMglC9A', 29830, 1987),
+  ('송재현', 'Thinking Out Loud - Ed Sheeran', 'https://www.youtube.com/watch?v=lp-EO5I60KA', 26780, 1754),
+  ('김예린', 'When We Were Young - Adele', 'https://www.youtube.com/watch?v=DDWKuo3gXMQ', 31290, 2089),
+  ('이동현', 'Photograph - Ed Sheeran', 'https://www.youtube.com/watch?v=nSDgHBxUbVQ', 28450, 1892),
+  ('박지민', 'Set Fire to the Rain - Adele', 'https://www.youtube.com/watch?v=RAz8FmiZYL8', 30120, 2013),
+  ('최현우', 'Castle on the Hill - Ed Sheeran', 'https://www.youtube.com/watch?v=K0ibBPhiaG0', 27560, 1834);
