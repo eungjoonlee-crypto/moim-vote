@@ -191,7 +191,7 @@ const Index = () => {
 
       <footer className="border-t border-border/50 mt-20">
         <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-          <p>© 2025 Voice of Tomorrow. All rights reserved.</p>
+          <p>© 2025 openmic_moim. All rights reserved.</p>
         </div>
       </footer>
     </div>
