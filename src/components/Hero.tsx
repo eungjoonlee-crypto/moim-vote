@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Music, LogIn, LogOut, User } from "lucide-react";
+import { Music, LogIn, LogOut, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +48,15 @@ export const Hero = () => {
             <span className="text-white/90 text-sm hidden sm:block">
               안녕하세요, {user.email?.split('@')[0]}님!
             </span>
+            <Link to="/admin">
+              <Button 
+                variant="outline" 
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                관리자
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
@@ -84,7 +93,7 @@ export const Hero = () => {
           
           <div className="flex items-center justify-center gap-8 pt-4">
             <div className="text-center">
-              <div className="text-4xl font-bold text-accent">12</div>
+              <div className="text-4xl font-bold text-accent">15</div>
               <div className="text-sm text-white/70">참가자</div>
             </div>
             <div className="h-12 w-px bg-white/20" />
