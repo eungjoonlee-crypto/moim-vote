@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Save, X, Plus, Trash2, ExternalLink } from "lucide-react";
-import { extractVideoId, isValidYouTubeUrl } from "@/lib/youtube";
+import { Edit, Save, X, Plus, Trash2, ExternalLink, Play } from "lucide-react";
+import { extractVideoId, isValidYouTubeUrl, getThumbnailUrlFromLink } from "@/lib/youtube";
 
 interface Contestant {
   id: string;
@@ -303,17 +303,34 @@ const Admin = () => {
 
         {/* 참가자 목록 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {contestants.map((contestant) => (
-            <Card key={contestant.id} className="overflow-hidden">
-              <div className="aspect-video relative overflow-hidden bg-black">
-                <iframe
-                  src={`https://www.youtube.com/embed/${contestant.youtube_id}`}
-                  title={`${contestant.name} - ${contestant.song}`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
-              </div>
+          {contestants.map((contestant) => {
+            const thumbnailUrl = getThumbnailUrlFromLink(contestant.youtube_url, 'high');
+            return (
+              <Card key={contestant.id} className="overflow-hidden">
+                <div className="aspect-video relative overflow-hidden bg-black">
+                  {thumbnailUrl ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={thumbnailUrl}
+                        alt={`${contestant.name} - ${contestant.song}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
+                        <Button
+                          onClick={() => window.open(contestant.youtube_url, '_blank')}
+                          size="lg"
+                          className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                        >
+                          <Play className="w-8 h-8 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                      <span className="text-white">썸네일 없음</span>
+                    </div>
+                  )}
+                </div>
               <CardContent className="p-4">
                 {editingId === contestant.id ? (
                   <div className="space-y-3">

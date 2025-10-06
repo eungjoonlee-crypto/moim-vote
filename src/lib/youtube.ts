@@ -1,5 +1,5 @@
 /**
- * YouTube 링크에서 영상 ID를 추출하는 함수들
+ * YouTube 링크에서 영상 ID를 추출하고 썸네일을 가져오는 함수들
  */
 
 /**
@@ -62,4 +62,67 @@ export const getWatchUrl = (videoId: string): string => {
 export const getEmbedUrlFromLink = (url: string): string | null => {
   const videoId = extractVideoId(url);
   return videoId ? getEmbedUrl(videoId) : null;
+};
+
+/**
+ * YouTube 영상 ID로 썸네일 URL을 생성합니다.
+ */
+export const getThumbnailUrl = (videoId: string, quality: 'default' | 'medium' | 'high' | 'standard' | 'maxres' = 'high'): string => {
+  const qualityMap = {
+    default: 'default',
+    medium: 'mqdefault',
+    high: 'hqdefault',
+    standard: 'sddefault',
+    maxres: 'maxresdefault'
+  };
+  
+  return `https://img.youtube.com/vi/${videoId}/${qualityMap[quality]}.jpg`;
+};
+
+/**
+ * YouTube 링크에서 썸네일 URL을 추출합니다.
+ */
+export const getThumbnailUrlFromLink = (url: string, quality: 'default' | 'medium' | 'high' | 'standard' | 'maxres' = 'high'): string | null => {
+  const videoId = extractVideoId(url);
+  return videoId ? getThumbnailUrl(videoId, quality) : null;
+};
+
+/**
+ * YouTube Data API를 통해 영상 정보를 가져옵니다.
+ * 실제 구현에서는 서버 사이드에서 API 키를 사용해야 합니다.
+ */
+export const getVideoInfo = async (videoId: string): Promise<{
+  title: string;
+  viewCount: number;
+  likeCount: number;
+  thumbnail: string;
+} | null> => {
+  try {
+    // 실제 구현에서는 YouTube Data API를 사용해야 합니다.
+    // 여기서는 더미 데이터를 반환합니다.
+    return {
+      title: `YouTube Video ${videoId}`,
+      viewCount: Math.floor(Math.random() * 1000000) + 10000,
+      likeCount: Math.floor(Math.random() * 10000) + 100,
+      thumbnail: getThumbnailUrl(videoId, 'high')
+    };
+  } catch (error) {
+    console.error('Error fetching video info:', error);
+    return null;
+  }
+};
+
+/**
+ * YouTube 링크에서 영상 정보를 가져옵니다.
+ */
+export const getVideoInfoFromLink = async (url: string): Promise<{
+  title: string;
+  viewCount: number;
+  likeCount: number;
+  thumbnail: string;
+} | null> => {
+  const videoId = extractVideoId(url);
+  if (!videoId) return null;
+  
+  return await getVideoInfo(videoId);
 };

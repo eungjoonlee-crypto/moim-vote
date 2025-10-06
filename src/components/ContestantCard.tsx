@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Heart, Share2, MessageCircle, Eye, ThumbsUp } from "lucide-react";
+import { Heart, Share2, MessageCircle, Eye, ThumbsUp, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getThumbnailUrlFromLink, extractVideoId } from "@/lib/youtube";
 
 // 재미있는 익명 닉네임 리스트
 const ANONYMOUS_NICKNAMES = [
@@ -43,18 +44,27 @@ interface ContestantCardProps {
   id: string;
   name: string;
   song: string;
-  youtubeId: string;
+  youtube_url: string;
+  youtube_id: string;
   views: number;
   likes: number;
 }
 
-export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: ContestantCardProps) => {
+export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views, likes }: ContestantCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLiked, setIsLiked] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likes);
+  const [showVideo, setShowVideo] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // 썸네일 URL 생성
+  useEffect(() => {
+    const thumbnail = getThumbnailUrlFromLink(youtube_url, 'high');
+    setThumbnailUrl(thumbnail);
+  }, [youtube_url]);
 
   // 사용자 투표 상태 확인
   useEffect(() => {
@@ -227,13 +237,38 @@ export const ContestantCard = ({ id, name, song, youtubeId, views, likes }: Cont
   return (
     <Card className="overflow-hidden card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
       <div className="aspect-video relative overflow-hidden bg-black">
-        <iframe
-          src={`https://www.youtube.com/embed/${youtubeId}`}
-          title={`${name} - ${song}`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="w-full h-full"
-        />
+        {showVideo ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${youtube_id}`}
+            title={`${name} - ${song}`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full"
+          />
+        ) : (
+          <div className="relative w-full h-full">
+            {thumbnailUrl && (
+              <img
+                src={thumbnailUrl}
+                alt={`${name} - ${song}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // 썸네일 로드 실패 시 기본 이미지 표시
+                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iIzAwMCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+WW91VHViZSBWaWRlbzwvdGV4dD48L3N2Zz4=';
+                }}
+              />
+            )}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
+              <Button
+                onClick={() => setShowVideo(true)}
+                size="lg"
+                className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
+              >
+                <Play className="w-8 h-8 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="p-6 space-y-4">

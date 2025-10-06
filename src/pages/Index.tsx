@@ -8,6 +8,7 @@ interface Contestant {
   id: string;
   name: string;
   song: string;
+  youtube_url: string;
   youtube_id: string;
   views: number;
   likes: number;
@@ -81,7 +82,8 @@ const Index = () => {
                 id={contestant.id}
                 name={contestant.name}
                 song={contestant.song}
-                youtubeId={contestant.youtube_id}
+                youtube_url={contestant.youtube_url}
+                youtube_id={contestant.youtube_id}
                 views={contestant.views}
                 likes={contestant.likes}
               />
