@@ -240,11 +240,26 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
       <div className="aspect-video relative overflow-hidden bg-black">
         {showVideo && !videoError ? (
           <iframe
-            src={`https://www.youtube.com/embed/${youtube_id}`}
+            src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}`}
             title={`${name} - ${song}`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="w-full h-full"
+            onLoad={() => {
+              // iframe이 로드되었지만 실제로는 오류일 수 있음
+              setTimeout(() => {
+                const iframe = document.querySelector(`iframe[src*="${youtube_id}"]`) as HTMLIFrameElement;
+                if (iframe && iframe.contentDocument?.title?.includes('Error')) {
+                  setVideoError(true);
+                  setShowVideo(false);
+                  toast({
+                    title: "영상 재생 불가",
+                    description: "이 영상은 다른 사이트에서 재생할 수 없습니다.",
+                    variant: "destructive",
+                  });
+                }
+              }, 2000);
+            }}
             onError={() => {
               setVideoError(true);
               setShowVideo(false);
@@ -260,16 +275,27 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             <div className="text-center text-white">
               <p className="text-lg font-semibold mb-2">영상을 불러올 수 없습니다</p>
               <p className="text-sm text-gray-300 mb-4">영상이 삭제되었거나 비공개일 수 있습니다</p>
-              <Button
-                onClick={() => {
-                  setVideoError(false);
-                  setShowVideo(false);
-                }}
-                variant="outline"
-                className="text-white border-white hover:bg-white hover:text-black"
-              >
-                썸네일로 돌아가기
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={() => {
+                    window.open(`https://www.youtube.com/watch?v=${youtube_id}`, '_blank');
+                  }}
+                  variant="default"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                >
+                  YouTube에서 보기
+                </Button>
+                <Button
+                  onClick={() => {
+                    setVideoError(false);
+                    setShowVideo(false);
+                  }}
+                  variant="outline"
+                  className="w-full text-white border-white hover:bg-white hover:text-black"
+                >
+                  썸네일로 돌아가기
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
@@ -286,13 +312,23 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
               />
             )}
             <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
-              <Button
-                onClick={() => setShowVideo(true)}
-                size="lg"
-                className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
-              >
-                <Play className="w-8 h-8 ml-1" />
-              </Button>
+              <div className="flex flex-col items-center space-y-3">
+                <Button
+                  onClick={() => setShowVideo(true)}
+                  size="lg"
+                  className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                >
+                  <Play className="w-8 h-8 ml-1" />
+                </Button>
+                <Button
+                  onClick={() => window.open(`https://www.youtube.com/watch?v=${youtube_id}`, '_blank')}
+                  size="sm"
+                  variant="outline"
+                  className="bg-black/50 border-white/50 text-white hover:bg-white/20 text-xs px-3 py-1"
+                >
+                  YouTube에서 보기
+                </Button>
+              </div>
             </div>
           </div>
         )}
