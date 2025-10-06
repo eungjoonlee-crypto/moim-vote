@@ -47,7 +47,7 @@ export const Hero = ({ title, subtitle, heroImageUrl }: HeroProps) => {
 
   return (
     <section className="relative overflow-hidden hero-gradient py-20 px-4">
-      <div className="absolute top-4 right-4 z-20">
+      <div className="fixed top-4 right-4 z-50">
         {loading ? (
           <Button variant="outline" className="bg-white/10 border-white/20 text-white backdrop-blur-sm" disabled>
             <User className="w-4 h-4 mr-2" />
@@ -83,7 +83,7 @@ export const Hero = ({ title, subtitle, heroImageUrl }: HeroProps) => {
           <Link to="/auth">
             <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm">
               <LogIn className="w-4 h-4 mr-2" />
-              로그인 / 회원가입
+              로그인
             </Button>
           </Link>
         )}
