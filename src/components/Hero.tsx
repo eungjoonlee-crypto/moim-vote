@@ -48,15 +48,18 @@ export const Hero = () => {
             <span className="text-white/90 text-sm hidden sm:block">
               안녕하세요, {user.email?.split('@')[0]}님!
             </span>
-            <Link to="/admin">
-              <Button 
-                variant="outline" 
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                관리자
-              </Button>
-            </Link>
+            {/* 관리자 버튼은 eungjoonlee@gmail.com만 볼 수 있음 */}
+            {user.email === 'eungjoonlee@gmail.com' && (
+              <Link to="/admin">
+                <Button 
+                  variant="outline" 
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  관리자
+                </Button>
+              </Link>
+            )}
             <Button 
               variant="outline" 
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
