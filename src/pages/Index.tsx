@@ -24,6 +24,11 @@ const Index = () => {
     const fetchContestants = async () => {
       try {
         console.log('Fetching contestants...');
+        
+        // Supabase 연결 확인
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Supabase session:', session);
+        
         const { data, error } = await supabase
           .from('contestants')
           .select('*')
@@ -32,6 +37,8 @@ const Index = () => {
         if (error) {
           console.error('Error fetching contestants:', error);
           toast.error('참가자 정보를 불러오는데 실패했습니다.');
+          // 오류가 있어도 빈 배열로 설정하여 빈 화면 방지
+          setContestants([]);
           return;
         }
 
@@ -50,6 +57,8 @@ const Index = () => {
       } catch (error) {
         console.error('Error:', error);
         toast.error('오류가 발생했습니다.');
+        // 오류가 있어도 빈 배열로 설정하여 빈 화면 방지
+        setContestants([]);
       } finally {
         setLoading(false);
       }
