@@ -314,8 +314,12 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             )}
             <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
               <div className="flex flex-col items-center space-y-3">
+                <div className="text-center text-white mb-2">
+                  <p className="text-sm font-medium">로컬 환경에서는</p>
+                  <p className="text-xs opacity-80">영상 재생이 제한될 수 있습니다</p>
+                </div>
                 <Button
-                  onClick={() => setShowVideo(true)}
+                  onClick={() => window.open(`https://www.youtube.com/watch?v=${youtube_id}`, '_blank')}
                   size="lg"
                   className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
                 >
