@@ -538,8 +538,9 @@ const Admin = () => {
                   </div>
                 )}
               </CardContent>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
