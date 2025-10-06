@@ -1,17 +1,70 @@
-import { Music, LogIn } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Music, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Hero = () => {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("로그아웃되었습니다!");
+    } catch (error: any) {
+      toast.error("로그아웃 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <section className="relative overflow-hidden hero-gradient py-20 px-4">
       <div className="absolute top-4 right-4 z-20">
-        <Link to="/auth">
-          <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm">
-            <LogIn className="w-4 h-4 mr-2" />
-            로그인 / 회원가입
+        {loading ? (
+          <Button variant="outline" className="bg-white/10 border-white/20 text-white backdrop-blur-sm" disabled>
+            <User className="w-4 h-4 mr-2" />
+            로딩 중...
           </Button>
-        </Link>
+        ) : user ? (
+          <div className="flex items-center gap-2">
+            <span className="text-white/90 text-sm hidden sm:block">
+              안녕하세요, {user.email?.split('@')[0]}님!
+            </span>
+            <Button 
+              variant="outline" 
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              로그아웃
+            </Button>
+          </div>
+        ) : (
+          <Link to="/auth">
+            <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm">
+              <LogIn className="w-4 h-4 mr-2" />
+              로그인 / 회원가입
+            </Button>
+          </Link>
+        )}
       </div>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
       
