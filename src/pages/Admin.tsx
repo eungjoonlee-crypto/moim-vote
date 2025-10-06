@@ -504,6 +504,18 @@ const Admin = () => {
                   <div className="space-y-2">
                     <h3 className="text-lg font-bold">{contestant.name}</h3>
                     <p className="text-sm text-muted-foreground">{contestant.song}</p>
+                    <div className="text-xs text-muted-foreground break-all">
+                      <span className="font-medium">YouTube URL:</span>
+                      <br />
+                      <a 
+                        href={contestant.youtube_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        {contestant.youtube_url}
+                      </a>
+                    </div>
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <span>조회수: {contestant.views.toLocaleString()}</span>
                       <span>좋아요: {contestant.likes.toLocaleString()}</span>
