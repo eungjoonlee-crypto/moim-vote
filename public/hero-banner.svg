@@ -6,8 +6,4 @@
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#heroGradient)"/>
-  <text x="600" y="280" font-family="Arial, sans-serif" font-size="80" font-weight="bold" text-anchor="middle" fill="white">싱어게이</text>
-  <text x="600" y="360" font-family="Arial, sans-serif" font-size="36" text-anchor="middle" fill="white">퀴어가수전</text>
-  <text x="600" y="420" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="rgba(255,255,255,0.9)">11월 1일 studio-moum에서 개최</text>
-  <text x="600" y="460" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="rgba(255,255,255,0.8)">최고의 목소리에 투표해주세요</text>
 </svg>
