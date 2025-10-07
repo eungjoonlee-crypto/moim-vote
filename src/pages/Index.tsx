@@ -7,7 +7,7 @@ import { startPeriodicSync } from "@/lib/youtube-api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowUp } from "lucide-react";
 
 interface Contestant {
   id: string;
@@ -38,6 +38,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredContestants, setFilteredContestants] = useState<Contestant[]>([]);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const contestantsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -141,6 +142,17 @@ const Index = () => {
     };
   }, []);
 
+  // 스크롤 이벤트 리스너
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // 검색 기능
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -165,6 +177,10 @@ const Index = () => {
     if (contestantsRef.current) {
       contestantsRef.current.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -282,6 +298,17 @@ const Index = () => {
           <p>© 2025 openmic moim 37th. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* 맨 위로 버튼 */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 rounded-full w-12 h-12 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"
+          size="icon"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   );
 };
