@@ -121,6 +121,25 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     checkUserVote();
   }, [id]);
 
+  // 투표 수 불러오기
+  const fetchVoteCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('votes')
+        .select('*', { count: 'exact', head: true })
+        .eq('contestant_id', id);
+
+      if (error) {
+        console.error('Error fetching vote count:', error);
+        return;
+      }
+
+      setCurrentVoteCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching vote count:', error);
+    }
+  };
+
   // 댓글 불러오기 (컴포넌트 로드 시 항상 실행)
   useEffect(() => {
     const fetchComments = async () => {
@@ -150,6 +169,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     };
 
     fetchComments();
+    fetchVoteCount(); // 투표 수도 함께 불러오기
   }, [id]);
 
   const handleShare = async () => {
@@ -252,7 +272,8 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         if (error) throw error;
         
         setIsLiked(false);
-        setCurrentVoteCount(prev => prev - 1);
+        // 데이터베이스에서 실제 투표 수 다시 불러오기
+        await fetchVoteCount();
         toast({
           title: "투표 취소",
           description: "투표를 취소했습니다.",
@@ -271,7 +292,8 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         if (error) throw error;
         
         setIsLiked(true);
-        setCurrentVoteCount(prev => prev + 1);
+        // 데이터베이스에서 실제 투표 수 다시 불러오기
+        await fetchVoteCount();
         toast({
           title: "투표 완료!",
           description: "이 참가자에게 투표했습니다!",
