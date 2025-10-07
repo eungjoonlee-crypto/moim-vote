@@ -43,9 +43,7 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
     }
   };
 
-  const backgroundOverlay = heroImageUrl
-    ? `absolute inset-0 bg-[url('${heroImageUrl}')] bg-cover bg-center opacity-30`
-    : "absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30";
+  const backgroundOverlay = "absolute inset-0";
 
   return (
     <section className="relative overflow-hidden hero-gradient py-20 px-4">
@@ -101,9 +99,16 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
       
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center space-y-6">
-          <h1 className="text-5xl md:text-7xl font-black text-white text-glow">
-            싱어게이
-          </h1>
+          {/* 로고 이미지 */}
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/logo-transparent.png" 
+              alt="싱어게이 로고" 
+              className="h-16 md:h-20 lg:h-24 w-auto object-contain"
+            />
+          </div>
+          
+      
           
           <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium">
             {subtitle || "11월 1일 studio-moum에서 개최되는 싱어게이 : 퀴어가수전, 최고의 목소리에 투표해주세요."}
