@@ -75,7 +75,7 @@ const Auth = () => {
             <Music className="w-8 h-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold text-foreground">
-            Voice of Tomorrow
+            Openmic moim
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             소셜 로그인으로 바로 시작하세요 (Google / Kakao)
