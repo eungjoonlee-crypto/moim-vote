@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Hero } from "@/components/Hero";
 import { useState as useReactState } from "react";
 import { ContestantCard } from "@/components/ContestantCard";
 import { supabase } from "@/integrations/supabase/client";
 import { startPeriodicSync } from "@/lib/youtube-api";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, X } from "lucide-react";
 
 interface Contestant {
   id: string;
@@ -33,6 +36,9 @@ const Index = () => {
   const [contestants, setContestants] = useState<Contestant[]>([]);
   const [siteSettings, setSiteSettings] = useReactState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredContestants, setFilteredContestants] = useState<Contestant[]>([]);
+  const contestantsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchContestants = async () => {
@@ -68,6 +74,7 @@ const Index = () => {
         }
         
         setContestants(shuffledContestants);
+        setFilteredContestants(shuffledContestants);
       } catch (error) {
         console.error('Error:', error);
         toast.error('오류가 발생했습니다.');
@@ -134,6 +141,32 @@ const Index = () => {
     };
   }, []);
 
+  // 검색 기능
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredContestants(contestants);
+      return;
+    }
+
+    const filtered = contestants.filter(contestant => 
+      contestant.name.toLowerCase().includes(query.toLowerCase()) ||
+      contestant.song.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredContestants(filtered);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setFilteredContestants(contestants);
+  };
+
+  const scrollToContestants = () => {
+    if (contestantsRef.current) {
+      contestantsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -155,6 +188,55 @@ const Index = () => {
         daysLeft={siteSettings?.hero_days_left ?? undefined}
       />
       
+      {/* 검색 섹션 */}
+      <section className="bg-card/50 border-b border-border/50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">참가자 검색</h2>
+            <p className="text-muted-foreground">참가자명이나 노래 제목으로 검색해보세요</p>
+          </div>
+          <div className="relative max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="참가자명 또는 노래 제목을 입력하세요..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10 pr-10 py-3 text-lg"
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+            {searchQuery && (
+              <div className="mt-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                  "{searchQuery}" 검색 결과: {filteredContestants.length}명
+                </p>
+                {filteredContestants.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={scrollToContestants}
+                    className="mt-2"
+                  >
+                    결과 보기
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+      
       <main className="container mx-auto px-4 py-16 max-w-7xl">
         <div className="mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
@@ -169,9 +251,16 @@ const Index = () => {
           <div className="text-center py-16">
             <p className="text-muted-foreground text-lg">아직 참가자가 없습니다.</p>
           </div>
+        ) : filteredContestants.length === 0 && searchQuery ? (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-lg">검색 결과가 없습니다.</p>
+            <Button variant="outline" onClick={clearSearch} className="mt-4">
+              검색 초기화
+            </Button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {contestants.map((contestant) => (
+          <div ref={contestantsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredContestants.map((contestant) => (
               <ContestantCard 
                 key={contestant.id} 
                 id={contestant.id}
