@@ -4,13 +4,10 @@
       <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
     </linearGradient>
-    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
-    </pattern>
   </defs>
   <rect width="1200" height="630" fill="url(#heroGradient)"/>
-  <rect width="1200" height="630" fill="url(#grid)"/>
-  <text x="600" y="300" font-family="Arial, sans-serif" font-size="72" font-weight="bold" text-anchor="middle" fill="white">싱어게이</text>
-  <text x="600" y="380" font-family="Arial, sans-serif" font-size="32" text-anchor="middle" fill="rgba(255,255,255,0.9)">11월 1일 studio-moum에서 개최되는 싱어게이 : 퀴어가수전</text>
-  <text x="600" y="420" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="rgba(255,255,255,0.8)">최고의 목소리에 투표해주세요</text>
+  <text x="600" y="280" font-family="Arial, sans-serif" font-size="80" font-weight="bold" text-anchor="middle" fill="white">싱어게이</text>
+  <text x="600" y="360" font-family="Arial, sans-serif" font-size="36" text-anchor="middle" fill="white">퀴어가수전</text>
+  <text x="600" y="420" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="rgba(255,255,255,0.9)">11월 1일 studio-moum에서 개최</text>
+  <text x="600" y="460" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="rgba(255,255,255,0.8)">최고의 목소리에 투표해주세요</text>
 </svg>
