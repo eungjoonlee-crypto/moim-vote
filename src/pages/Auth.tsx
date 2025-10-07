@@ -78,7 +78,7 @@ const Auth = () => {
             Openmic moim
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            소셜 로그인으로 바로 시작하세요 (Google / Kakao)
+            로그인 정보는 행사 종료 후 완전 파기됩니다.
           </CardDescription>
         </CardHeader>
 
