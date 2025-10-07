@@ -121,7 +121,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     checkUserVote();
   }, [id]);
 
-  // 댓글 불러오기
+  // 댓글 불러오기 (컴포넌트 로드 시 항상 실행)
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -133,12 +133,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
 
         if (error) {
           console.error('Error fetching comments:', error);
-          toast({
-            title: "댓글 로드 실패",
-            description: "댓글을 불러오는 중 오류가 발생했습니다.",
-            variant: "destructive",
-          });
-          return;
+          return; // 토스트 메시지 제거 (사용자에게 불필요한 알림 방지)
         }
 
         const formattedComments = data?.map(comment => ({
@@ -150,18 +145,12 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         setComments(formattedComments);
       } catch (error) {
         console.error('Error fetching comments:', error);
-        toast({
-          title: "댓글 로드 실패",
-          description: "댓글을 불러오는 중 오류가 발생했습니다.",
-          variant: "destructive",
-        });
+        // 토스트 메시지 제거 (사용자에게 불필요한 알림 방지)
       }
     };
 
-    if (showComments) {
-      fetchComments();
-    }
-  }, [id, showComments]);
+    fetchComments();
+  }, [id]);
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}?contestant=${id}`;
