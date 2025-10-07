@@ -209,9 +209,6 @@ const Index = () => {
       <section className="py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-center text-2xl font-bold text-foreground">참가자 검색</CardTitle>
-            </CardHeader>
             <CardContent>
               <div className="flex gap-2 max-w-2xl mx-auto">
                 <div className="relative flex-1">
