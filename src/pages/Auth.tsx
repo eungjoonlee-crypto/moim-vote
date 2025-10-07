@@ -40,9 +40,8 @@ const Auth = () => {
           redirectTo,
           queryParams: {
             prompt: 'select_account',
-            // iOS 외부 브라우저 신뢰 대상
-            origin,
           },
+          flowType: 'pkce',
         },
       });
       if (error) throw error;
@@ -57,6 +56,7 @@ const Auth = () => {
         provider: "kakao",
         options: {
           redirectTo,
+          flowType: 'pkce',
         },
       });
       if (error) throw error;
