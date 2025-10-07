@@ -7,6 +7,7 @@ import { startPeriodicSync } from "@/lib/youtube-api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, X, ArrowUp } from "lucide-react";
 
 interface Contestant {
@@ -205,51 +206,61 @@ const Index = () => {
       />
       
       {/* 검색 섹션 */}
-      <section className="bg-card/50 border-b border-border/50 py-8">
+      <section className="py-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-2">참가자 검색</h2>
-            <p className="text-muted-foreground">참가자명이나 노래 제목으로 검색해보세요</p>
-          </div>
-          <div className="relative max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="참가자명 또는 노래 제목을 입력하세요..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 pr-10 py-3 text-lg"
-              />
-              {searchQuery && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center text-2xl font-bold text-foreground">참가자 검색</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2 max-w-2xl mx-auto">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                  <Input
+                    type="text"
+                    placeholder="참가자명 또는 노래 제목을 입력하세요..."
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="pl-10 pr-10 py-3 text-lg"
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearSearch}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearSearch}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                  onClick={() => handleSearch(searchQuery)}
+                  className="px-6 py-3"
                 >
-                  <X className="w-4 h-4" />
+                  <Search className="w-4 h-4 mr-2" />
+                  검색
                 </Button>
-              )}
-            </div>
-            {searchQuery && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  "{searchQuery}" 검색 결과: {filteredContestants.length}명
-                </p>
-                {filteredContestants.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={scrollToContestants}
-                    className="mt-2"
-                  >
-                    결과 보기
-                  </Button>
-                )}
               </div>
-            )}
-          </div>
+              {searchQuery && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    "{searchQuery}" 검색 결과: {filteredContestants.length}명
+                  </p>
+                  {filteredContestants.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={scrollToContestants}
+                      className="mt-2"
+                    >
+                      결과 보기
+                    </Button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </section>
       
