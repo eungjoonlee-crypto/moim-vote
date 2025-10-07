@@ -124,24 +124,38 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   // 댓글 불러오기
   useEffect(() => {
     const fetchComments = async () => {
-      const { data, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('contestant_id', id)
-        .order('created_at', { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from('comments')
+          .select('*')
+          .eq('contestant_id', id)
+          .order('created_at', { ascending: false });
 
-      if (error) {
+        if (error) {
+          console.error('Error fetching comments:', error);
+          toast({
+            title: "댓글 로드 실패",
+            description: "댓글을 불러오는 중 오류가 발생했습니다.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const formattedComments = data?.map(comment => ({
+          author: getRandomNickname(), // 재미있는 랜덤 익명 닉네임
+          text: comment.content,
+          timestamp: new Date(comment.created_at)
+        })) || [];
+
+        setComments(formattedComments);
+      } catch (error) {
         console.error('Error fetching comments:', error);
-        return;
+        toast({
+          title: "댓글 로드 실패",
+          description: "댓글을 불러오는 중 오류가 발생했습니다.",
+          variant: "destructive",
+        });
       }
-
-      const formattedComments = data?.map(comment => ({
-        author: getRandomNickname(), // 재미있는 랜덤 익명 닉네임
-        text: comment.content,
-        timestamp: new Date(comment.created_at)
-      })) || [];
-
-      setComments(formattedComments);
     };
 
     if (showComments) {
@@ -190,14 +204,26 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
 
       if (error) throw error;
 
-      // 즉시 화면에 댓글 추가 (랜덤 익명 닉네임 사용)
-      const newCommentObj = {
-        author: getRandomNickname(), // 재미있는 랜덤 익명 닉네임
-        text: newComment,
-        timestamp: new Date()
-      };
+      // 댓글 작성 성공 후 데이터베이스에서 다시 불러오기
+      const { data, error: fetchError } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('contestant_id', id)
+        .order('created_at', { ascending: false });
+
+      if (fetchError) {
+        console.error('Error fetching comments after insert:', fetchError);
+        // 에러가 있어도 댓글은 저장되었으므로 성공 메시지 표시
+      } else {
+        const formattedComments = data?.map(comment => ({
+          author: getRandomNickname(), // 재미있는 랜덤 익명 닉네임
+          text: comment.content,
+          timestamp: new Date(comment.created_at)
+        })) || [];
+        
+        setComments(formattedComments);
+      }
       
-      setComments(prev => [newCommentObj, ...prev]);
       setNewComment("");
       
       toast({
@@ -205,6 +231,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         description: "댓글이 성공적으로 작성되었습니다.",
       });
     } catch (error: any) {
+      console.error('Error inserting comment:', error);
       toast({
         title: "댓글 작성 실패",
         description: error.message || "댓글 작성에 실패했습니다.",
