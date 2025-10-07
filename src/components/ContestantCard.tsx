@@ -75,7 +75,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     setThumbnailUrl(thumbnail);
   }, [youtube_url]);
 
-  // 모바일에서 카드가 뷰포트에 보이면 자동 재생, 사라지면 정지
+  // 모바일에서 카드가 뷰포트에 보이면 2초 후 자동 재생, 사라지면 정지
   useEffect(() => {
     const isMobile = typeof window !== 'undefined' && (
       window.matchMedia('(pointer: coarse)').matches || /Mobi|Android/i.test(navigator.userAgent)
@@ -83,12 +83,19 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     if (!isMobile) return;
     if (!cardRef.current) return;
 
+    let playTimeout: NodeJS.Timeout;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setShowVideo(true);
+            // 2초 지연 후 재생
+            playTimeout = setTimeout(() => {
+              setShowVideo(true);
+            }, 2000);
           } else {
+            // 즉시 정지
+            clearTimeout(playTimeout);
             setShowVideo(false);
           }
         });
@@ -97,7 +104,10 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     );
 
     observer.observe(cardRef.current);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(playTimeout);
+      observer.disconnect();
+    };
   }, []);
 
   // 사용자 투표 상태 확인
