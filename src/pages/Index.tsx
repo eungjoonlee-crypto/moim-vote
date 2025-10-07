@@ -206,58 +206,54 @@ const Index = () => {
       />
       
       {/* 검색 섹션 */}
-      <section className="py-8">
+      <section className="py-12">
         <div className="container mx-auto px-4 max-w-4xl">
-          <Card>
-            <CardContent>
-              <div className="flex gap-2 max-w-2xl mx-auto">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                  <Input
-                    type="text"
-                    placeholder="참가자명 또는 노래 제목을 입력하세요..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    className="pl-10 pr-10 py-3 text-lg"
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearSearch}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-                <Button
-                  onClick={() => handleSearch(searchQuery)}
-                  className="px-6 py-3"
-                >
-                  <Search className="w-4 h-4 mr-2" />
-                  검색
-                </Button>
-              </div>
+          <div className="flex gap-3 max-w-3xl mx-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="참가자명 또는 노래 제목을 입력하세요..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10 pr-10 py-4 text-lg h-14"
+              />
               {searchQuery && (
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    "{searchQuery}" 검색 결과: {filteredContestants.length}명
-                  </p>
-                  {filteredContestants.length > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={scrollToContestants}
-                      className="mt-2"
-                    >
-                      결과 보기
-                    </Button>
-                  )}
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               )}
-            </CardContent>
-          </Card>
+            </div>
+            <Button
+              onClick={() => handleSearch(searchQuery)}
+              className="px-8 py-4 h-14 text-lg"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              검색
+            </Button>
+          </div>
+          {searchQuery && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                "{searchQuery}" 검색 결과: {filteredContestants.length}명
+              </p>
+              {filteredContestants.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={scrollToContestants}
+                  className="mt-3"
+                >
+                  결과 보기
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </section>
       
