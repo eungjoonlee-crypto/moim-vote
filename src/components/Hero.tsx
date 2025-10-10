@@ -71,8 +71,8 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
           <div>
             {loading ? (
               <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white backdrop-blur-sm" disabled>
-                <User className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">로딩 중...</span>
+                <User className="w-4 h-4 mr-2 hidden sm:inline" />
+                로딩 중...
               </Button>
             ) : user ? (
               <div className="flex items-center gap-1 sm:gap-2">
@@ -84,10 +84,10 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="px-2 sm:px-3"
+                      className="px-3 sm:px-3"
                     >
-                      <Settings className="w-4 h-4 sm:mr-2" />
-                      <span className="hidden sm:inline">관리자</span>
+                      <Settings className="w-4 h-4 mr-2 hidden sm:inline" />
+                      관리자
                     </Button>
                   </Link>
                 )}
@@ -95,10 +95,10 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
                   variant="outline" 
                   size="sm"
                   onClick={handleLogout}
-                  className="px-2 sm:px-3"
+                  className="px-3 sm:px-3"
                 >
-                  <LogOut className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">로그아웃</span>
+                  <LogOut className="w-4 h-4 mr-2 hidden sm:inline" />
+                  로그아웃
                 </Button>
               </div>
             ) : (
@@ -109,10 +109,10 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
               >
                 <Button
                   size="sm"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-3 sm:px-4"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 sm:px-4"
                 >
-                  <LogIn className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">로그인</span>
+                  <LogIn className="w-4 h-4 mr-2 hidden sm:inline" />
+                  로그인
                 </Button>
               </a>
             )}
@@ -124,8 +124,8 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
         <div className={`fixed top-3 right-3 sm:top-4 sm:right-4 z-50 transition-opacity duration-300 ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           {loading ? (
             <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white backdrop-blur-sm" disabled>
-              <User className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">로딩 중...</span>
+              <User className="w-4 h-4 mr-2 hidden sm:inline" />
+              로딩 중...
             </Button>
           ) : user ? (
             <div className="flex items-center gap-1 sm:gap-2">
@@ -138,21 +138,21 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
                   <Button 
                     variant="outline"
                     size="sm"
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm px-2 sm:px-3"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm px-3"
                   >
-                    <Settings className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">관리자</span>
+                    <Settings className="w-4 h-4 mr-2 hidden sm:inline" />
+                    관리자
                   </Button>
                 </Link>
               )}
               <Button 
                 variant="outline"
                 size="sm"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm px-2 sm:px-3"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm px-3"
                 onClick={handleLogout}
               >
-                <LogOut className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">로그아웃</span>
+                <LogOut className="w-4 h-4 mr-2 hidden sm:inline" />
+                로그아웃
               </Button>
             </div>
           ) : (
@@ -162,10 +162,10 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
               rel="noopener noreferrer"
             >
               <Button
-                className="rounded-full px-4 sm:px-5 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/60 focus:outline-none text-sm sm:text-base"
+                className="rounded-full px-5 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/60 focus:outline-none"
               >
-                <LogIn className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
-                <span className="hidden sm:inline">로그인</span>
+                <LogIn className="w-4 h-4 sm:w-5 sm:h-5 mr-2 hidden sm:inline" />
+                로그인
               </Button>
             </a>
           )}
