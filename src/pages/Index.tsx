@@ -249,7 +249,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-16 max-w-7xl">
         <div className="mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
-            참가자 무대
+            투표 및 응원하기
           </h2>
           <p className="text-muted-foreground text-lg">
             각 참가자의 영상을 시청하고 응원 댓글을 남겨주세요
