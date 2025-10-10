@@ -234,7 +234,10 @@ const Index = () => {
               )}
             </div>
             <Button
-              onClick={() => handleSearch(searchQuery)}
+              onClick={() => {
+                handleSearch(searchQuery);
+                setTimeout(() => scrollToContestants(), 100);
+              }}
               className="px-4 py-2 h-14 text-lg"
             >
               이동
@@ -245,16 +248,6 @@ const Index = () => {
               <p className="text-sm text-muted-foreground">
                 "{searchQuery}" 검색 결과: {filteredContestants.length}명
               </p>
-              {filteredContestants.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={scrollToContestants}
-                  className="mt-3"
-                >
-                  결과 보기
-                </Button>
-              )}
             </div>
           )}
         </div>
