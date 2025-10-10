@@ -134,19 +134,22 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   // 투표 수 불러오기
   const fetchVoteCount = async () => {
     try {
+      console.log(`[${name}] Fetching vote count for contestant:`, id);
+      
       const { count, error } = await supabase
         .from('votes')
         .select('*', { count: 'exact', head: true })
         .eq('contestant_id', id);
 
       if (error) {
-        console.error('Error fetching vote count:', error);
+        console.error(`[${name}] Error fetching vote count:`, error);
         return;
       }
 
+      console.log(`[${name}] Vote count fetched:`, count);
       setCurrentVoteCount(count || 0);
     } catch (error) {
-      console.error('Error fetching vote count:', error);
+      console.error(`[${name}] Error fetching vote count:`, error);
     }
   };
 
@@ -273,23 +276,31 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     try {
       if (isLiked) {
         // 투표 취소
+        console.log(`[${name}] Deleting vote for user:`, user.id);
         const { error } = await supabase
           .from('votes')
           .delete()
           .eq('user_id', user.id)
           .eq('contestant_id', id);
 
-        if (error) throw error;
+        if (error) {
+          console.error(`[${name}] Delete vote error:`, error);
+          throw error;
+        }
         
+        console.log(`[${name}] Vote deleted successfully`);
         setIsLiked(false);
+        
         // 데이터베이스에서 실제 투표 수 다시 불러오기
         await fetchVoteCount();
+        
         toast({
           title: "투표 취소",
           description: "투표를 취소했습니다.",
         });
       } else {
         // 투표하기 (upsert 사용으로 재투표 가능)
+        console.log(`[${name}] Inserting vote for user:`, user.id);
         const { error } = await supabase
           .from('votes')
           .upsert({
@@ -299,17 +310,24 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             onConflict: 'user_id,contestant_id'
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error(`[${name}] Insert vote error:`, error);
+          throw error;
+        }
         
+        console.log(`[${name}] Vote inserted successfully`);
         setIsLiked(true);
+        
         // 데이터베이스에서 실제 투표 수 다시 불러오기
         await fetchVoteCount();
+        
         toast({
           title: "투표 완료!",
           description: "이 참가자에게 투표했습니다!",
         });
       }
     } catch (error: any) {
+      console.error(`[${name}] Vote error:`, error);
       toast({
         title: "투표 실패",
         description: error.message || "투표에 실패했습니다.",
