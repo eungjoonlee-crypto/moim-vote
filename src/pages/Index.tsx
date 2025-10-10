@@ -283,7 +283,14 @@ const Index = () => {
                 vote_count={contestant.vote_count}
                 isPlaying={currentPlayingVideo === contestant.id}
                 onPlayChange={(isPlaying) => {
-                  setCurrentPlayingVideo(isPlaying ? contestant.id : null);
+                  console.log(`[Index] Contestant ${contestant.name} (${contestant.id}) play change: ${isPlaying}`);
+                  if (isPlaying) {
+                    // 새 영상이 재생되면 이전 영상 정지
+                    setCurrentPlayingVideo(contestant.id);
+                  } else if (currentPlayingVideo === contestant.id) {
+                    // 현재 재생 중인 영상이 정지되면 재생 상태 초기화
+                    setCurrentPlayingVideo(null);
+                  }
                 }}
               />
             ))}

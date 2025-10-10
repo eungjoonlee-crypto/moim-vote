@@ -69,18 +69,26 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   const [showVideo, setShowVideo] = useState(false);
   const [localWantsToPlay, setLocalWantsToPlay] = useState(false);
   
-  // isPlaying prop 변경 시 showVideo 상태 동기화
+  // isPlaying prop 변경 시 showVideo 상태 동기화 (더 안정적인 로직)
   useEffect(() => {
-    // 다른 영상이 재생 중이면 이 영상 정지
-    if (!isPlaying && showVideo) {
-      setShowVideo(false);
-      setLocalWantsToPlay(false);
+    console.log(`[${name}] isPlaying: ${isPlaying}, localWantsToPlay: ${localWantsToPlay}, showVideo: ${showVideo}`);
+    
+    if (isPlaying && localWantsToPlay) {
+      // 이 영상이 재생 권한을 얻었고, 로컬에서 재생을 원하면 재생
+      if (!showVideo) {
+        setShowVideo(true);
+        setVideoError(false); // 재생 시 에러 상태 초기화
+      }
+    } else {
+      // 다른 영상이 재생 중이거나 로컬에서 재생을 원하지 않으면 정지
+      if (showVideo) {
+        setShowVideo(false);
+      }
+      if (!isPlaying) {
+        setLocalWantsToPlay(false);
+      }
     }
-    // 이 영상이 재생 권한을 얻었고, 로컬에서 재생을 원하면 재생
-    if (isPlaying && localWantsToPlay && !showVideo) {
-      setShowVideo(true);
-    }
-  }, [isPlaying, localWantsToPlay]);
+  }, [isPlaying, localWantsToPlay, showVideo, name]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
   const { toast } = useToast();
@@ -91,7 +99,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     setThumbnailUrl(thumbnail);
   }, [youtube_url]);
 
-  // 모바일에서 카드가 뷰포트에 보이면 2초 후 자동 재생, 사라지면 정지
+  // 모바일에서 카드가 뷰포트에 보이면 자동 재생, 사라지면 정지 (개선된 로직)
   useEffect(() => {
     const isMobile = typeof window !== 'undefined' && (
       window.matchMedia('(pointer: coarse)').matches || /Mobi|Android/i.test(navigator.userAgent)
@@ -100,26 +108,39 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     if (!cardRef.current) return;
 
     let playTimeout: NodeJS.Timeout;
+    let isCurrentlyIntersecting = false;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // 2초 지연 후 재생 요청
+          const wasIntersecting = isCurrentlyIntersecting;
+          isCurrentlyIntersecting = entry.isIntersecting;
+          
+          console.log(`[${name}] Intersection changed: ${wasIntersecting} -> ${isCurrentlyIntersecting}, intersectionRatio: ${entry.intersectionRatio}`);
+          
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            // 카드가 충분히 보이면 1.5초 후 재생 요청 (기존 2초에서 단축)
+            clearTimeout(playTimeout);
             playTimeout = setTimeout(() => {
+              console.log(`[${name}] Mobile auto-play triggered`);
               setLocalWantsToPlay(true);
               onPlayChange?.(true);
-            }, 2000);
-          } else {
-            // 즉시 정지
+            }, 1500);
+          } else if (!entry.isIntersecting || entry.intersectionRatio < 0.3) {
+            // 카드가 보이지 않거나 충분히 보이지 않으면 즉시 정지
             clearTimeout(playTimeout);
+            console.log(`[${name}] Mobile auto-play stopped`);
             setLocalWantsToPlay(false);
             setShowVideo(false);
             onPlayChange?.(false);
           }
         });
       },
-      { root: null, rootMargin: '0px', threshold: 0.6 }
+      { 
+        root: null, 
+        rootMargin: '0px', 
+        threshold: [0, 0.3, 0.6, 1.0] // 여러 임계값으로 더 정확한 감지
+      }
     );
 
     observer.observe(cardRef.current);
@@ -127,7 +148,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
       clearTimeout(playTimeout);
       observer.disconnect();
     };
-  }, [onPlayChange]);
+  }, [onPlayChange, name]);
 
   // 사용자 투표 상태 확인
   useEffect(() => {
@@ -435,10 +456,12 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             <div 
               className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/10 transition-colors cursor-pointer"
               onMouseEnter={() => {
+                console.log(`[${name}] Desktop hover enter`);
                 setLocalWantsToPlay(true);
                 onPlayChange?.(true);
               }}
               onMouseLeave={() => {
+                console.log(`[${name}] Desktop hover leave`);
                 setLocalWantsToPlay(false);
                 setShowVideo(false);
                 onPlayChange?.(false);
