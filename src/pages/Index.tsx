@@ -217,7 +217,7 @@ const Index = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <Input
                 type="text"
-                placeholder="참가자 번호로 검색해보세요."
+                placeholder="참가자 번호(ex. 1호) 입력 후 이동 클릭"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10 pr-10 py-4 text-lg h-14"
