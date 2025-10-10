@@ -67,7 +67,11 @@ const Index = () => {
         console.log('Contestants data:', data);
         
         // 참가자 순서를 랜덤으로 섞기 (Fisher-Yates 셔플 알고리즘)
-        const contestants = data || [];
+        // vote_count가 없는 경우 0으로 기본값 설정
+        const contestants = (data || []).map(c => ({
+          ...c,
+          vote_count: c.vote_count ?? 0
+        }));
         const shuffledContestants = [...contestants];
         
         for (let i = shuffledContestants.length - 1; i > 0; i--) {
