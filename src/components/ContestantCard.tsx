@@ -49,9 +49,11 @@ interface ContestantCardProps {
   views: number;
   likes: number;
   vote_count: number;
+  isPlaying?: boolean;
+  onPlayChange?: (isPlaying: boolean) => void;
 }
 
-export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views, likes, vote_count }: ContestantCardProps) => {
+export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views, likes, vote_count, isPlaying = false, onPlayChange }: ContestantCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
@@ -65,6 +67,13 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     setCurrentVoteCount(vote_count);
   }, [vote_count]);
   const [showVideo, setShowVideo] = useState(false);
+  
+  // isPlaying prop 변경 시 showVideo 상태 동기화
+  useEffect(() => {
+    if (!isPlaying && showVideo) {
+      setShowVideo(false);
+    }
+  }, [isPlaying]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
   const { toast } = useToast();
@@ -92,11 +101,13 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             // 2초 지연 후 재생
             playTimeout = setTimeout(() => {
               setShowVideo(true);
+              onPlayChange?.(true);
             }, 2000);
           } else {
             // 즉시 정지
             clearTimeout(playTimeout);
             setShowVideo(false);
+            onPlayChange?.(false);
           }
         });
       },
@@ -108,7 +119,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
       clearTimeout(playTimeout);
       observer.disconnect();
     };
-  }, []);
+  }, [onPlayChange]);
 
   // 사용자 투표 상태 확인
   useEffect(() => {
@@ -339,7 +350,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   return (
     <Card className="overflow-hidden card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
       <div ref={cardRef} className="aspect-video relative overflow-hidden bg-black">
-        {showVideo && !videoError ? (
+        {showVideo && isPlaying && !videoError ? (
           <iframe
             src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1`}
             title={`${name} - ${song}`}
@@ -415,8 +426,14 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             )}
             <div 
               className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/10 transition-colors cursor-pointer"
-              onMouseEnter={() => setShowVideo(true)}
-              onMouseLeave={() => setShowVideo(false)}
+              onMouseEnter={() => {
+                setShowVideo(true);
+                onPlayChange?.(true);
+              }}
+              onMouseLeave={() => {
+                setShowVideo(false);
+                onPlayChange?.(false);
+              }}
             >
               <div className="flex flex-col items-center space-y-3">
                 <Button

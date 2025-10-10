@@ -40,6 +40,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredContestants, setFilteredContestants] = useState<Contestant[]>([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [currentPlayingVideo, setCurrentPlayingVideo] = useState<string | null>(null);
   const contestantsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -280,6 +281,10 @@ const Index = () => {
                 views={contestant.views}
                 likes={contestant.likes}
                 vote_count={contestant.vote_count}
+                isPlaying={currentPlayingVideo === contestant.id}
+                onPlayChange={(isPlaying) => {
+                  setCurrentPlayingVideo(isPlaying ? contestant.id : null);
+                }}
               />
             ))}
           </div>
