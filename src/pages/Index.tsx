@@ -243,13 +243,6 @@ const Index = () => {
               이동
             </Button>
           </div>
-          {searchQuery && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                "{searchQuery}" 검색 결과: {filteredContestants.length}명
-              </p>
-            </div>
-          )}
         </div>
       </section>
       
@@ -314,3 +307,4 @@ const Index = () => {
 };
 
 export default Index;
+
