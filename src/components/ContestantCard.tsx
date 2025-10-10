@@ -67,13 +67,20 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     setCurrentVoteCount(vote_count);
   }, [vote_count]);
   const [showVideo, setShowVideo] = useState(false);
+  const [localWantsToPlay, setLocalWantsToPlay] = useState(false);
   
   // isPlaying prop 변경 시 showVideo 상태 동기화
   useEffect(() => {
+    // 다른 영상이 재생 중이면 이 영상 정지
     if (!isPlaying && showVideo) {
       setShowVideo(false);
+      setLocalWantsToPlay(false);
     }
-  }, [isPlaying]);
+    // 이 영상이 재생 권한을 얻었고, 로컬에서 재생을 원하면 재생
+    if (isPlaying && localWantsToPlay && !showVideo) {
+      setShowVideo(true);
+    }
+  }, [isPlaying, localWantsToPlay]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
   const { toast } = useToast();
@@ -98,14 +105,15 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // 2초 지연 후 재생
+            // 2초 지연 후 재생 요청
             playTimeout = setTimeout(() => {
-              setShowVideo(true);
+              setLocalWantsToPlay(true);
               onPlayChange?.(true);
             }, 2000);
           } else {
             // 즉시 정지
             clearTimeout(playTimeout);
+            setLocalWantsToPlay(false);
             setShowVideo(false);
             onPlayChange?.(false);
           }
@@ -350,7 +358,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   return (
     <Card className="overflow-hidden card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
       <div ref={cardRef} className="aspect-video relative overflow-hidden bg-black">
-        {showVideo && isPlaying && !videoError ? (
+        {showVideo && !videoError ? (
           <iframe
             src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1`}
             title={`${name} - ${song}`}
@@ -427,10 +435,11 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             <div 
               className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/10 transition-colors cursor-pointer"
               onMouseEnter={() => {
-                setShowVideo(true);
+                setLocalWantsToPlay(true);
                 onPlayChange?.(true);
               }}
               onMouseLeave={() => {
+                setLocalWantsToPlay(false);
                 setShowVideo(false);
                 onPlayChange?.(false);
               }}
