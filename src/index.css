@@ -101,28 +101,62 @@ All colors MUST be HSL.
   }
 }
 
-/* Sonner 토스트 하단 고정 스타일 */
-[data-sonner-toaster] {
+/* Sonner 토스트 하단 고정 스타일 - 강력한 CSS 규칙 */
+[data-sonner-toaster],
+.sonner-toaster,
+[data-sonner-toaster][data-theme],
+[data-sonner-toaster][data-rich-colors] {
   position: fixed !important;
   bottom: 1rem !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   top: auto !important;
   right: auto !important;
-  z-index: 9999 !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
 }
 
-[data-sonner-toaster] [data-sonner-toast] {
+[data-sonner-toaster] [data-sonner-toast],
+[data-sonner-toaster] > div,
+.sonner-toaster [data-sonner-toast] {
   margin-bottom: 0.5rem !important;
+  pointer-events: auto !important;
 }
 
 /* 모바일에서 더 확실하게 하단 고정 */
 @media (max-width: 768px) {
-  [data-sonner-toaster] {
+  [data-sonner-toaster],
+  .sonner-toaster,
+  [data-sonner-toaster][data-theme],
+  [data-sonner-toaster][data-rich-colors] {
     bottom: 1rem !important;
     left: 1rem !important;
     right: 1rem !important;
     transform: none !important;
     width: calc(100% - 2rem) !important;
+    max-width: calc(100% - 2rem) !important;
   }
+  
+  [data-sonner-toaster] [data-sonner-toast],
+  [data-sonner-toaster] > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* 추가 보장을 위한 더 강력한 규칙 */
+body [data-sonner-toaster] {
+  top: unset !important;
+  bottom: 1rem !important;
+}
+
+/* 모든 가능한 Sonner 관련 클래스에 적용 */
+.sonner-toaster,
+.sonner-toaster[data-theme="dark"],
+.sonner-toaster[data-theme="light"],
+[data-sonner-toaster="true"] {
+  position: fixed !important;
+  bottom: 1rem !important;
+  top: auto !important;
+  z-index: 99999 !important;
 }
