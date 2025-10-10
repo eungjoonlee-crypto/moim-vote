@@ -237,7 +237,7 @@ const Index = () => {
               onClick={() => handleSearch(searchQuery)}
               className="px-4 py-2 h-14 text-lg"
             >
-              검색
+              이동
             </Button>
           </div>
           {searchQuery && (
