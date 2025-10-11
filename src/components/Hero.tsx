@@ -184,7 +184,7 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
             </div>
             
             <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium">
-              {subtitle || "11월 1일 studio-moum에서 개최되는 싱어게이 : 퀴어가수전, 최고의 목소리에 투표해주세요."}
+              {subtitle || "openmic moim, 최고의 목소리에 투표해주세요"}
             </p>
             
             <div className="flex items-center justify-center gap-8 pt-4">
