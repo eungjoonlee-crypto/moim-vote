@@ -46,7 +46,7 @@
     <div class="instructions">
         <h1>🎨 OG 이미지 생성기 - Hero 스타일</h1>
         <p>아래 버튼을 클릭하여 <strong>og-image.png</strong> 파일을 다운로드하세요.</p>
-        <p>이 이미지는 Hero 컴포넌트와 동일한 그라데이션 배경을 사용합니다.</p>
+        <p>이 이미지는 Hero 컴포넌트와 동일한 그라데이션 배경만 사용합니다 (텍스트 없음).</p>
     </div>
     
     <div class="preview">
@@ -92,31 +92,7 @@
         ctx.fillStyle = radialGradient;
         ctx.fillRect(0, 0, 1200, 630);
 
-        // 메인 제목
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 80px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 4;
-        ctx.fillText('openmic moim 37th', 600, 260);
-
-        // 부제목
-        ctx.font = '38px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.shadowBlur = 15;
-        ctx.fillText('최고의 목소리에 투표해주세요', 600, 340);
-
-        // 설명
-        ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-        ctx.shadowBlur = 10;
-        ctx.fillText('싱어게이 : 퀴어가수전', 600, 400);
-
-        // 그림자 초기화
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
+        // 텍스트 제거됨 - 그라데이션 배경만 사용
 
         function downloadImage() {
             const link = document.createElement('a');
