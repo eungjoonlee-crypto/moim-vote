@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate OG Image - Hero Style</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .preview {
+            margin: 20px 0;
+            border: 2px solid #555;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .instructions {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, hsl(348, 83%, 47%) 0%, hsl(263, 70%, 50%) 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h1>🎨 OG 이미지 생성기 - Hero 스타일</h1>
+        <p>아래 버튼을 클릭하여 <strong>og-image.png</strong> 파일을 다운로드하세요.</p>
+        <p>이 이미지는 Hero 컴포넌트와 동일한 그라데이션 배경을 사용합니다.</p>
+    </div>
+    
+    <div class="preview">
+        <canvas id="canvas" width="1200" height="630"></canvas>
+    </div>
+    
+    <button onclick="downloadImage()">⬇️ og-image.png 다운로드</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Hero 컴포넌트와 동일한 그라데이션 배경 생성
+        // --hero-gradient: linear-gradient(135deg, hsl(348 83% 47%) 0%, hsl(263 70% 50%) 100%);
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        gradient.addColorStop(0, 'hsl(348, 83%, 47%)');  // 빨간색 #dc2626
+        gradient.addColorStop(1, 'hsl(263, 70%, 50%)');  // 보라색 #7c3aed
+
+        // 배경 채우기
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        // 격자 패턴 추가 (미묘한 효과)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 1200; i += 80) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, 630);
+            ctx.stroke();
+        }
+        for (let i = 0; i < 630; i += 80) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(1200, i);
+            ctx.stroke();
+        }
+
+        // 중앙 원형 빛 효과
+        const radialGradient = ctx.createRadialGradient(600, 315, 50, 600, 315, 400);
+        radialGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+        radialGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = radialGradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        // 메인 제목
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 80px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 4;
+        ctx.fillText('openmic moim 37th', 600, 260);
+
+        // 부제목
+        ctx.font = '38px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.shadowBlur = 15;
+        ctx.fillText('최고의 목소리에 투표해주세요', 600, 340);
+
+        // 설명
+        ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.shadowBlur = 10;
+        ctx.fillText('싱어게이 : 퀴어가수전', 600, 400);
+
+        // 그림자 초기화
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'og-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // 사용자 피드백
+            alert('✅ og-image.png 다운로드가 시작되었습니다!\n\n다운로드한 파일을 프로젝트 루트 디렉토리에 저장하세요.');
+        }
+
+        // 자동으로 이미지 품질 향상
+        canvas.style.imageRendering = 'high-quality';
+    </script>
+</body>
+</html>
