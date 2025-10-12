@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Heart, Share2, MessageCircle, Eye, ThumbsUp, Play } from "lucide-react";
+import { Heart, Share2, MessageCircle, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -487,22 +487,8 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
           <p className="text-muted-foreground">{song}</p>
         </div>
 
-        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4" />
-            <span>{views.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <ThumbsUp className="w-4 h-4" />
-            <span>{currentLikes.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Heart className="w-4 h-4" />
-            <span>{currentVoteCount.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
+        {/* 하단 통합 버튼 레이아웃 */}
+        <div className="flex items-center gap-2">
           <Button
             variant={isLiked ? "default" : "outline"}
             className="flex-1"
@@ -511,6 +497,11 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             <Heart className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`} />
             {isLiked ? "투표 취소" : "투표하기"}
           </Button>
+          
+          <div className="flex items-center gap-1 px-3 py-2 bg-muted/50 rounded-md border border-border/50">
+            <Heart className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium">{currentVoteCount.toLocaleString()}</span>
+          </div>
           
           <Button variant="outline" size="icon" onClick={handleShare}>
             <Share2 className="w-4 h-4" />
