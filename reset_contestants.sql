@@ -20,7 +20,9 @@ INSERT INTO contestants (name, song, youtube_url, youtube_id, views, likes, vote
   ('5호 가수', '심규선', 'https://youtu.be/swqBMZ3FlNg', 'swqBMZ3FlNg', 0, 0, 0),
   ('6호 가수', 'Don''t Rain On My Parade (Glee OST)', 'https://youtu.be/p_oIlBEXTL8', 'p_oIlBEXTL8', 0, 0, 0),
   ('7호 가수', '서울의 달', 'https://youtu.be/Gz6o0a7xfTQ', 'Gz6o0a7xfTQ', 0, 0, 0),
-  ('8호 가수', '입술의 말', 'https://youtu.be/RiL464NrDho', 'RiL464NrDho', 0, 0, 0);
+  ('8호 가수', '입술의 말', 'https://youtu.be/RiL464NrDho', 'RiL464NrDho', 0, 0, 0),
+  ('9호 가수', 'Billy Joel - New York State of Mind', 'https://youtu.be/OfqvhpHZDsQ', 'OfqvhpHZDsQ', 0, 0, 0),
+  ('10호 가수', '정승환 - 눈사람', 'https://youtu.be/UHsN-Gd4K9Q', 'UHsN-Gd4K9Q', 0, 0, 0);
 
 -- 4. 결과 확인
 SELECT 

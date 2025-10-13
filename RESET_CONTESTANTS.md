@@ -23,6 +23,8 @@
 | 6호 | 6호 가수 | Don't Rain On My Parade (Glee OST) | [링크](https://youtu.be/p_oIlBEXTL8) |
 | 7호 | 7호 가수 | 서울의 달 | [링크](https://youtu.be/Gz6o0a7xfTQ) |
 | 8호 | 8호 가수 | 입술의 말 | [링크](https://youtu.be/RiL464NrDho) |
+| 9호 | 9호 가수 | Billy Joel - New York State of Mind | [링크](https://youtu.be/OfqvhpHZDsQ) |
+| 10호 | 10호 가수 | 정승환 - 눈사람 | [링크](https://youtu.be/UHsN-Gd4K9Q) |
 
 ---
 
@@ -40,7 +42,7 @@
 
 ### 3. 결과 확인
 스크립트 실행 후 다음과 같은 결과가 표시됩니다:
-- 8명의 새로운 참가자가 추가됨
+- 10명의 새로운 참가자가 추가됨
 - 모든 참가자의 초기 통계 (views, likes, vote_count)가 0으로 설정됨
 
 ---
@@ -49,14 +51,14 @@
 
 ### 웹사이트에서 확인
 1. 웹사이트 새로고침 (Ctrl/Cmd + Shift + R)
-2. 8명의 새로운 참가자 카드가 표시되는지 확인
+2. 10명의 새로운 참가자 카드가 표시되는지 확인
 3. 각 카드의 YouTube 영상이 정상적으로 재생되는지 확인
 
 ### 데이터베이스에서 확인
 ```sql
 -- 참가자 수 확인
 SELECT COUNT(*) FROM contestants;
--- 결과: 8
+-- 결과: 10
 
 -- 모든 참가자 정보 확인
 SELECT id, name, song, youtube_id FROM contestants ORDER BY id;
@@ -94,7 +96,7 @@ SELECT setval('comments_id_seq', 1, false);
 
 - [ ] 기존 데이터 백업 완료 (선택사항)
 - [ ] `reset_contestants.sql` 스크립트 실행
-- [ ] 8명의 참가자가 데이터베이스에 추가되었는지 확인
+- [ ] 10명의 참가자가 데이터베이스에 추가되었는지 확인
 - [ ] 웹사이트에서 새로운 참가자 카드가 표시되는지 확인
 - [ ] YouTube 영상 재생이 정상적으로 작동하는지 확인
 - [ ] 투표 기능이 정상적으로 작동하는지 테스트
