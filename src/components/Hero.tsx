@@ -63,7 +63,7 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
         <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <img 
-              src="/logo-transparent.png" 
+              src="/logo-transparent.png?v=2" 
               alt="싱어게이 로고" 
               className="h-8 sm:h-10 w-auto object-contain"
             />
