@@ -7,34 +7,41 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getThumbnailUrlFromLink, extractVideoId } from "@/lib/youtube";
 
-// 재미있는 익명 닉네임 리스트
+// 재미있는 익명 닉네임 리스트 (팝스타 + 일상 상황)
 const ANONYMOUS_NICKNAMES = [
-  "🎵 음악마니아", "🎤 보컬러버", "🎶 멜로디킹", "🎼 하모니퀸", "🎹 피아니스트",
-  "🎸 기타리스트", "🥁 드러머", "🎺 트럼펫터", "🎻 바이올리니스트", "🎪 서커스마스터",
-  "🌟 스타가수", "🎭 연기자", "🎨 아티스트", "🎪 엔터테이너", "🎊 파티마스터",
-  "🎉 축하요정", "🎈 풍선마스터", "🎁 선물요정", "🎀 리본퀸", "🎂 케이크마스터",
-  "🍰 디저트러버", "☕ 커피마니아", "🍕 피자러버", "🍔 햄버거킹", "🍟 프라이마스터",
-  "🍦 아이스크림퀸", "🍭 캔디러버", "🍫 초콜릿러버", "🍪 쿠키마스터", "🧁 컵케이크퀸",
-  "🌈 무지개요정", "☀️ 태양님", "🌙 달님", "⭐ 별님", "🌠 별똥별",
-  "🌻 해바라기", "🌹 장미퀸", "🌸 벚꽃요정", "🌺 꽃님", "🌿 나뭇잎",
-  "🐱 고양이", "🐶 강아지", "🐰 토끼", "🐻 곰돌이", "🐼 팬더",
-  "🦄 유니콘", "🐧 펭귄", "🐸 개구리", "🐝 벌", "🦋 나비",
-  "🚀 로켓", "✈️ 비행기", "🚗 자동차", "🚲 자전거", "🏍️ 오토바이",
-  "🎯 정확한사수", "🏆 챔피언", "🥇 금메달리스트", "🥈 은메달리스트", "🥉 동메달리스트",
-  "🏅 메달리스트", "🎖️ 훈장수여자", "🏵️ 리본수여자", "🎗️ 리본퀸", "🎪 서커스스타",
-  "🎨 화가", "🖌️ 붓마스터", "🖍️ 크레용아티스트", "✏️ 연필마스터", "📝 작가",
-  "📚 독서왕", "📖 책벌레", "📰 신문독자", "📑 문서마스터", "📋 체크리스트",
-  "💡 아이디어왕", "🔍 탐정", "🕵️ 스파이", "👨‍💼 비즈니스맨", "👩‍💼 비즈니스우먼",
-  "👨‍🔬 과학자", "👩‍🔬 여성과학자", "👨‍⚕️ 의사", "👩‍⚕️ 여의사", "👨‍🏫 교사",
-  "👩‍🏫 여교사", "👨‍🎓 졸업생", "👩‍🎓 여졸업생", "👨‍🎨 예술가", "👩‍🎨 여성예술가"
+  "🛒 장보다 온 비욘세", "📦 택배 기다리는 레이디가가", "🍜 라면 끓이는 마이클잭슨", "👕 빨래 널다가 온 아리아나그란데", "🚇 출근길의 테일러스위프트",
+  "💼 야근하는 드레이크", "🍗 치킨 시키는 에드시런", "🏃 배달 온 저스틴비버", "☕ 카페에 온 빌리아일리시", "🎮 게임하는 브루노마스",
+  "🛏️ 이불 속 리한나", "🚿 샤워 중인 셀레나고메즈", "📱 폰 보는 위켄드", "🍕 피자 먹는 카디비", "🧹 청소하는 샤키라",
+  "🚗 운전 중인 캐티페리", "🏋️ 헬스하는 크리스브라운", "📺 드라마 보는 니키미나즈", "🛌 낮잠 자는 칸예웨스트", "🍔 햄버거 먹는 포스트말론",
+  "🎬 넷플릭스 보는 제이지", "🚴 자전거 타는 샘스미스", "🧘 요가하는 케이티페리", "📚 독서하는 존레전드", "🎨 그림 그리는 할시",
+  "🏃‍♀️ 조깅하는 듀아리파", "🍿 팝콘 먹는 찰리푸스", "🎧 음악 듣는 위켄드", "🛵 오토바이 타는 트래비스스캇", "🍰 케이크 먹는 멕스",
+  "☕ 커피 마시는 아델", "🌮 타코 먹는 배드버니", "🎪 서커스 온 레이디가가", "🏊 수영하는 샘스미스", "🎳 볼링 치는 포스트말론",
+  "🎤 노래방 온 머라이어캐리", "🎹 피아노 치는 앨리샤키스", "🎸 기타 치는 존메이어", "🥁 드럼 치는 트래비스바커", "🎻 바이올린 켜는 린지스털링",
+  "🎮 PC방 온 드레이크", "🍜 짜파게티 먹는 BTS", "🚕 택시 타는 블랙핑크", "🏪 편의점 온 저스틴팀버레이크", "🎭 연극 보는 레이디가가",
+  "🌙 밤샘하는 위켄드", "🌅 일찍 일어난 테일러스위프트", "🚌 버스 타는 아리아나그란데", "🏃 지각하는 저스틴비버", "📖 만화 보는 빌리아일리시",
+  "🍱 도시락 싸는 비욘세", "🧺 장바구니 든 리한나", "🚪 문 열고 들어온 셀레나고메즈", "🪟 창문 닦는 에드시런", "🧽 설거지하는 브루노마스",
+  "🎂 생일 파티 온 케이티페리", "🎉 축하하는 크리스브라운", "🎁 선물 포장하는 니키미나즈", "💐 꽃 받은 칸예웨스트", "🎈 풍선 부는 포스트말론",
+  "🍿 영화 보는 제이지", "🎬 감독 흉내 내는 샘스미스", "📸 사진 찍는 할시", "🖼️ 전시회 온 듀아리파", "🎨 미술관 온 찰리푸스",
+  "🏖️ 휴가 중인 아델", "✈️ 비행기 탄 배드버니", "🏝️ 섬에 온 트래비스스캇", "⛱️ 해변의 머라이어캐리", "🏔️ 등산하는 앨리샤키스"
 ];
 
-// 랜덤 닉네임 생성 함수
-const getRandomNickname = () => {
-  return ANONYMOUS_NICKNAMES[Math.floor(Math.random() * ANONYMOUS_NICKNAMES.length)];
+// 댓글 ID를 기반으로 일관된 닉네임 생성 함수
+// 같은 댓글 ID는 항상 같은 닉네임을 반환합니다
+const getNicknameFromId = (commentId: string) => {
+  // 문자열을 숫자로 변환 (간단한 해시 함수)
+  let hash = 0;
+  for (let i = 0; i < commentId.length; i++) {
+    const char = commentId.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 32비트 정수로 변환
+  }
+  // 음수를 양수로 변환하고 닉네임 배열 길이로 나눈 나머지 사용
+  const index = Math.abs(hash) % ANONYMOUS_NICKNAMES.length;
+  return ANONYMOUS_NICKNAMES[index];
 };
 
 interface Comment {
+  id: string;
   author: string;
   text: string;
   timestamp: Date;
@@ -209,7 +216,8 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         }
 
         const formattedComments = data?.map(comment => ({
-          author: getRandomNickname(), // 재미있는 랜덤 익명 닉네임
+          id: comment.id, // 댓글 ID 추가
+          author: getNicknameFromId(comment.id), // 댓글 ID 기반 일관된 익명 닉네임
           text: comment.content,
           timestamp: new Date(comment.created_at)
         })) || [];
@@ -278,7 +286,8 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         // 에러가 있어도 댓글은 저장되었으므로 성공 메시지 표시
       } else {
         const formattedComments = data?.map(comment => ({
-          author: getRandomNickname(), // 재미있는 랜덤 익명 닉네임
+          id: comment.id, // 댓글 ID 추가
+          author: getNicknameFromId(comment.id), // 댓글 ID 기반 일관된 익명 닉네임
           text: comment.content,
           timestamp: new Date(comment.created_at)
         })) || [];
@@ -540,9 +549,9 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
             {comments.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">댓글 {comments.length}</h4>
-                {comments.map((comment, index) => (
+                {comments.map((comment) => (
                   <div
-                    key={`comment-${index}`}
+                    key={comment.id}
                     className="bg-muted/30 rounded-lg p-3 space-y-1"
                   >
                     <div className="flex items-center justify-between">
