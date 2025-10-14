@@ -25,6 +25,13 @@
 | 8호 | 8호 가수 | 입술의 말 | [링크](https://youtu.be/RiL464NrDho) |
 | 9호 | 9호 가수 | Billy Joel - New York State of Mind | [링크](https://youtu.be/OfqvhpHZDsQ) |
 | 10호 | 10호 가수 | 정승환 - 눈사람 | [링크](https://youtu.be/UHsN-Gd4K9Q) |
+| 11호 | 11호 가수 | 좋은날 (아이유) | [링크](https://youtu.be/-KFLqSBuL6k) |
+| 12호 | 12호 가수 | Popular (뮤지컬 Wicked) | [링크](https://youtu.be/rGjmP4WTuXE) |
+| 13호 | 13호 가수 | 매일 매일 기다려 (서도밴드) | [링크](https://youtu.be/y9CVjBi7bDg) |
+| 14호 | 14호 가수 | 마마 (김필선) | [링크](https://youtu.be/tnW0Z4OGQzU) |
+| 15호 | 15호 가수 | 너에게 못했던 내 마지막 말은 (다비치) | [링크](https://youtu.be/OfqvhpHZDsQ) |
+| 16호 | 16호 가수 | Unholy (Sam smith) | [링크](https://youtu.be/_UcK40Do400) |
+| 17호 | 17호 가수 | Monologue (버즈) | [링크](https://youtu.be/sEYP-qcfkus) |
 
 ---
 
@@ -42,7 +49,7 @@
 
 ### 3. 결과 확인
 스크립트 실행 후 다음과 같은 결과가 표시됩니다:
-- 10명의 새로운 참가자가 추가됨
+- 17명의 새로운 참가자가 추가됨
 - 모든 참가자의 초기 통계 (views, likes, vote_count)가 0으로 설정됨
 
 ---
@@ -51,14 +58,14 @@
 
 ### 웹사이트에서 확인
 1. 웹사이트 새로고침 (Ctrl/Cmd + Shift + R)
-2. 10명의 새로운 참가자 카드가 표시되는지 확인
+2. 17명의 새로운 참가자 카드가 표시되는지 확인
 3. 각 카드의 YouTube 영상이 정상적으로 재생되는지 확인
 
 ### 데이터베이스에서 확인
 ```sql
 -- 참가자 수 확인
 SELECT COUNT(*) FROM contestants;
--- 결과: 10
+-- 결과: 17
 
 -- 모든 참가자 정보 확인
 SELECT id, name, song, youtube_id FROM contestants ORDER BY id;
@@ -96,7 +103,7 @@ SELECT setval('comments_id_seq', 1, false);
 
 - [ ] 기존 데이터 백업 완료 (선택사항)
 - [ ] `reset_contestants.sql` 스크립트 실행
-- [ ] 10명의 참가자가 데이터베이스에 추가되었는지 확인
+- [ ] 17명의 참가자가 데이터베이스에 추가되었는지 확인
 - [ ] 웹사이트에서 새로운 참가자 카드가 표시되는지 확인
 - [ ] YouTube 영상 재생이 정상적으로 작동하는지 확인
 - [ ] 투표 기능이 정상적으로 작동하는지 테스트

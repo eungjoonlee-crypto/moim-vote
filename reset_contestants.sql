@@ -22,7 +22,14 @@ INSERT INTO contestants (name, song, youtube_url, youtube_id, views, likes, vote
   ('7호 가수', '서울의 달', 'https://youtu.be/Gz6o0a7xfTQ', 'Gz6o0a7xfTQ', 0, 0, 0),
   ('8호 가수', '입술의 말', 'https://youtu.be/RiL464NrDho', 'RiL464NrDho', 0, 0, 0),
   ('9호 가수', 'Billy Joel - New York State of Mind', 'https://youtu.be/OfqvhpHZDsQ', 'OfqvhpHZDsQ', 0, 0, 0),
-  ('10호 가수', '정승환 - 눈사람', 'https://youtu.be/UHsN-Gd4K9Q', 'UHsN-Gd4K9Q', 0, 0, 0);
+  ('10호 가수', '정승환 - 눈사람', 'https://youtu.be/UHsN-Gd4K9Q', 'UHsN-Gd4K9Q', 0, 0, 0),
+  ('11호 가수', '좋은날 (아이유)', 'https://youtu.be/-KFLqSBuL6k', '-KFLqSBuL6k', 0, 0, 0),
+  ('12호 가수', 'Popular (뮤지컬 Wicked)', 'https://youtu.be/rGjmP4WTuXE', 'rGjmP4WTuXE', 0, 0, 0),
+  ('13호 가수', '매일 매일 기다려 (서도밴드)', 'https://youtu.be/y9CVjBi7bDg', 'y9CVjBi7bDg', 0, 0, 0),
+  ('14호 가수', '마마 (김필선)', 'https://youtu.be/tnW0Z4OGQzU', 'tnW0Z4OGQzU', 0, 0, 0),
+  ('15호 가수', '너에게 못했던 내 마지막 말은 (다비치)', 'https://youtu.be/OfqvhpHZDsQ', 'OfqvhpHZDsQ', 0, 0, 0),
+  ('16호 가수', 'Unholy (Sam smith)', 'https://youtu.be/_UcK40Do400', '_UcK40Do400', 0, 0, 0),
+  ('17호 가수', 'Monologue (버즈)', 'https://youtu.be/sEYP-qcfkus', 'sEYP-qcfkus', 0, 0, 0);
 
 -- 4. 결과 확인
 SELECT 
