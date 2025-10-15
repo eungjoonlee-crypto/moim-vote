@@ -82,6 +82,33 @@ const Index = () => {
         
         setContestants(shuffledContestants);
         setFilteredContestants(shuffledContestants);
+
+        // URL 파라미터에서 특정 참가자 ID 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedContestantId = urlParams.get('contestant');
+        
+        if (selectedContestantId) {
+          // 선택된 참가자가 존재하는지 확인
+          const selectedContestant = shuffledContestants.find(c => c.id === selectedContestantId);
+          if (selectedContestant) {
+            console.log(`선택된 참가자: ${selectedContestant.name} (${selectedContestantId})`);
+            // 선택된 참가자의 영상을 자동으로 재생
+            setCurrentPlayingVideo(selectedContestantId);
+            
+            // 해당 참가자 카드로 스크롤
+            setTimeout(() => {
+              const contestantElement = document.querySelector(`[data-contestant-id="${selectedContestantId}"]`);
+              if (contestantElement) {
+                contestantElement.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'center' 
+                });
+              }
+            }, 500);
+          } else {
+            console.warn(`참가자 ID ${selectedContestantId}를 찾을 수 없습니다.`);
+          }
+        }
       } catch (error) {
         console.error('Error:', error);
         toast.error('오류가 발생했습니다.');
@@ -103,7 +130,21 @@ const Index = () => {
           console.warn('site_settings fetch error:', error.message);
         }
         if (data) {
-          setSiteSettings(data as SiteSettings);
+          // 클라이언트 측에서 2025년 10월 22일까지 남은 일수 자동 계산
+          const targetDate = new Date('2025-10-22');
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+          const diffTime = targetDate.getTime() - today.getTime();
+          const daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+          
+          // 계산된 남은 일수로 덮어쓰기
+          const updatedSettings = {
+            ...data,
+            hero_days_left: daysLeft
+          };
+          
+          setSiteSettings(updatedSettings as SiteSettings);
+          
           // 동적으로 메타 태그 업데이트
           const t = data.meta_title || '싱어게이 : 퀴어가수전';
           const d = data.meta_description || '싱어게이 : 퀴어가수전 - 예선 투표에 참여하세요!';
@@ -271,28 +312,29 @@ const Index = () => {
         ) : (
           <div ref={contestantsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredContestants.map((contestant) => (
-              <ContestantCard 
-                key={contestant.id} 
-                id={contestant.id}
-                name={contestant.name}
-                song={contestant.song}
-                youtube_url={contestant.youtube_url}
-                youtube_id={contestant.youtube_id}
-                views={contestant.views}
-                likes={contestant.likes}
-                vote_count={contestant.vote_count}
-                isPlaying={currentPlayingVideo === contestant.id}
-                onPlayChange={(isPlaying) => {
-                  console.log(`[Index] Contestant ${contestant.name} (${contestant.id}) play change: ${isPlaying}`);
-                  if (isPlaying) {
-                    // 새 영상이 재생되면 이전 영상 정지
-                    setCurrentPlayingVideo(contestant.id);
-                  } else if (currentPlayingVideo === contestant.id) {
-                    // 현재 재생 중인 영상이 정지되면 재생 상태 초기화
-                    setCurrentPlayingVideo(null);
-                  }
-                }}
-              />
+              <div key={contestant.id} data-contestant-id={contestant.id}>
+                <ContestantCard 
+                  id={contestant.id}
+                  name={contestant.name}
+                  song={contestant.song}
+                  youtube_url={contestant.youtube_url}
+                  youtube_id={contestant.youtube_id}
+                  views={contestant.views}
+                  likes={contestant.likes}
+                  vote_count={contestant.vote_count}
+                  isPlaying={currentPlayingVideo === contestant.id}
+                  onPlayChange={(isPlaying) => {
+                    console.log(`[Index] Contestant ${contestant.name} (${contestant.id}) play change: ${isPlaying}`);
+                    if (isPlaying) {
+                      // 새 영상이 재생되면 이전 영상 정지
+                      setCurrentPlayingVideo(contestant.id);
+                    } else if (currentPlayingVideo === contestant.id) {
+                      // 현재 재생 중인 영상이 정지되면 재생 상태 초기화
+                      setCurrentPlayingVideo(null);
+                    }
+                  }}
+                />
+              </div>
             ))}
           </div>
         )}

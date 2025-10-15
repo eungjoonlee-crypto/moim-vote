@@ -234,12 +234,13 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   }, [id]);
 
   const handleShare = async () => {
+    // 참가자 페이지 URL로 공유 (자동 재생 포함)
     const shareUrl = `${window.location.origin}?contestant=${id}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
       toast({
         title: "링크 복사 완료!",
-        description: "참가자 링크가 클립보드에 복사되었습니다.",
+        description: `${name}의 참가자 페이지 링크가 클립보드에 복사되었습니다. 링크를 열면 해당 영상이 자동으로 재생됩니다.`,
       });
     } catch (err) {
       toast({
