@@ -130,8 +130,8 @@ const Index = () => {
           console.warn('site_settings fetch error:', error.message);
         }
         if (data) {
-          // 클라이언트 측에서 2025년 10월 22일까지 남은 일수 자동 계산
-          const targetDate = new Date('2025-10-22');
+          // 클라이언트 측에서 2025년 10월 21일까지 남은 일수 자동 계산
+          const targetDate = new Date('2025-10-21');
           const today = new Date();
           today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
           const diffTime = targetDate.getTime() - today.getTime();

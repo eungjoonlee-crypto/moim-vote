@@ -26,8 +26,8 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 목표 날짜: 2025년 10월 22일
-    const targetDate = new Date('2025-10-22');
+    // 목표 날짜: 2025년 10월 21일
+    const targetDate = new Date('2025-10-21');
     const today = new Date();
     today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
 
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
         daysLeft,
         message: `남은 일수가 ${daysLeft}일로 업데이트되었습니다.`,
         updatedAt: new Date().toISOString(),
-        targetDate: '2025-10-22',
+        targetDate: '2025-10-21',
         data: updateData
       }),
       {

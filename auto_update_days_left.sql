@@ -1,10 +1,10 @@
--- 2025년 10월 22일까지 남은 일수 자동 계산 및 업데이트
+-- 2025년 10월 21일까지 남은 일수 자동 계산 및 업데이트
 
 -- Step 1: 남은 일수를 계산하는 함수 생성
 CREATE OR REPLACE FUNCTION calculate_days_left()
 RETURNS INTEGER AS $$
 DECLARE
-  target_date DATE := '2025-10-22';
+  target_date DATE := '2025-10-21';
   days_remaining INTEGER;
 BEGIN
   -- 현재 날짜(한국 시간 기준)와 목표 날짜의 차이 계산

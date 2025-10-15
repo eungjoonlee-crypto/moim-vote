@@ -1,10 +1,10 @@
 # 남은 일수 자동 업데이트 설정 가이드
 
-2025년 10월 22일까지 남은 일수를 자동으로 계산하고 매일 자정에 업데이트하는 기능입니다.
+2025년 10월 21일까지 남은 일수를 자동으로 계산하고 매일 자정에 업데이트하는 기능입니다.
 
 ## 📋 개요
 
-- **목표 날짜**: 2025년 10월 22일
+- **목표 날짜**: 2025년 10월 21일
 - **업데이트 주기**: 매일 자정 (한국 시간 00:00)
 - **대상 필드**: `site_settings.hero_days_left`
 - **자동화 방식**: PostgreSQL 함수 + pg_cron (또는 대안 방법)
@@ -71,8 +71,8 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 목표 날짜: 2025년 10월 22일
-    const targetDate = new Date('2025-10-22');
+    // 목표 날짜: 2025년 10월 21일
+    const targetDate = new Date('2025-10-21');
     const today = new Date();
     today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
 
@@ -183,7 +183,7 @@ const fetchSettings = async () => {
     
     if (data) {
       // 클라이언트 측에서 남은 일수 계산
-      const targetDate = new Date('2025-10-22');
+      const targetDate = new Date('2025-10-21');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const diffTime = targetDate.getTime() - today.getTime();
@@ -359,8 +359,8 @@ SELECT cron.schedule(
 ## 📊 현재 남은 일수
 
 2025년 10월 14일 기준:
-- 목표: 2025년 10월 22일
-- **남은 일수: 8일**
+- 목표: 2025년 10월 21일
+- **남은 일수: 7일**
 
 자동 업데이트가 설정되면 매일 자정에 자동으로 1씩 감소합니다.
 
