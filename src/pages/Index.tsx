@@ -130,20 +130,14 @@ const Index = () => {
           console.warn('site_settings fetch error:', error.message);
         }
         if (data) {
-          // 클라이언트 측에서 2025년 10월 21일까지 남은 일수 자동 계산
-          const targetDate = new Date('2025-10-21');
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
-          const diffTime = targetDate.getTime() - today.getTime();
-          const daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+          setSiteSettings(data as SiteSettings);
           
-          // 계산된 남은 일수로 덮어쓰기
-          const updatedSettings = {
-            ...data,
-            hero_days_left: daysLeft
-          };
-          
-          setSiteSettings(updatedSettings as SiteSettings);
+          // 디버깅을 위한 로그
+          console.log('Site settings loaded:', {
+            hero_days_left: data.hero_days_left,
+            hero_title: data.hero_title,
+            updated_at: data.updated_at
+          });
           
           // 동적으로 메타 태그 업데이트
           const t = data.meta_title || '싱어게이 : 퀴어가수전';

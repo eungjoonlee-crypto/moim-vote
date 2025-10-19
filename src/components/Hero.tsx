@@ -18,6 +18,14 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // 디버깅을 위한 로그
+  console.log('Hero component props:', {
+    daysLeft,
+    contestantCount,
+    title,
+    subtitle
+  });
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();

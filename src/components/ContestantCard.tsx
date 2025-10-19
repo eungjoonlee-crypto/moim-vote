@@ -160,23 +160,36 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   // 사용자 투표 상태 확인
   useEffect(() => {
     const checkUserVote = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-      const { data } = await supabase
-        .from('votes')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('contestant_id', id)
-        .single();
+        const { data, error } = await supabase
+          .from('votes')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('contestant_id', id)
+          .single();
 
-      if (data) {
-        setIsLiked(true);
+        if (error) {
+          console.warn(`[${name}] 투표 상태 확인 오류:`, error.message, error.code);
+          // 406 오류인 경우 특별 처리
+          if (error.code === 'PGRST301' || error.message.includes('406')) {
+            console.warn(`[${name}] RLS 정책 문제로 투표 상태를 확인할 수 없습니다.`);
+          }
+          return;
+        }
+
+        if (data) {
+          setIsLiked(true);
+        }
+      } catch (error) {
+        console.error(`[${name}] 투표 상태 확인 중 오류:`, error);
       }
     };
 
     checkUserVote();
-  }, [id]);
+  }, [id, name]);
 
   // 투표 수 불러오기
   const fetchVoteCount = async () => {
@@ -189,14 +202,18 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         .eq('contestant_id', id);
 
       if (error) {
-        console.error(`[${name}] Error fetching vote count:`, error);
+        console.error(`[${name}] 투표 수 조회 오류:`, error.message, error.code);
+        // 406 오류인 경우 특별 처리
+        if (error.code === 'PGRST301' || error.message.includes('406')) {
+          console.warn(`[${name}] RLS 정책 문제로 투표 수를 가져올 수 없습니다.`);
+        }
         return;
       }
 
       console.log(`[${name}] Vote count fetched:`, count);
       setCurrentVoteCount(count || 0);
     } catch (error) {
-      console.error(`[${name}] Error fetching vote count:`, error);
+      console.error(`[${name}] 투표 수 조회 중 예외 발생:`, error);
     }
   };
 
@@ -334,7 +351,15 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
           .eq('contestant_id', id);
 
         if (error) {
-          console.error(`[${name}] Delete vote error:`, error);
+          console.error(`[${name}] 투표 삭제 오류:`, error.message, error.code);
+          if (error.code === 'PGRST301' || error.message.includes('406')) {
+            toast({
+              title: "권한 오류",
+              description: "투표를 삭제할 권한이 없습니다. 관리자에게 문의하세요.",
+              variant: "destructive",
+            });
+            return;
+          }
           throw error;
         }
         
@@ -361,7 +386,15 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
           });
 
         if (error) {
-          console.error(`[${name}] Insert vote error:`, error);
+          console.error(`[${name}] 투표 추가 오류:`, error.message, error.code);
+          if (error.code === 'PGRST301' || error.message.includes('406')) {
+            toast({
+              title: "권한 오류",
+              description: "투표할 권한이 없습니다. 관리자에게 문의하세요.",
+              variant: "destructive",
+            });
+            return;
+          }
           throw error;
         }
         
