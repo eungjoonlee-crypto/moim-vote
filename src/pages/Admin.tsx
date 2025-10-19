@@ -45,8 +45,8 @@ const Admin = () => {
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
   const { toast } = useToast();
 
-  // 자동 동기화 활성화 (30분마다)
-  useAutoSync(30, autoSyncEnabled);
+  // 자동 동기화 활성화 (1시간마다)
+  useAutoSync(60, autoSyncEnabled);
 
   useEffect(() => {
     fetchContestants();
