@@ -40,6 +40,51 @@ const getNicknameFromId = (commentId: string) => {
   return ANONYMOUS_NICKNAMES[index];
 };
 
+// 브라우저별 고유 ID 생성 및 관리 (익명 투표용)
+const getAnonymousVoterId = (): string => {
+  const STORAGE_KEY = 'anonymous_voter_id';
+  
+  // 기존 ID가 있으면 반환
+  let voterId = localStorage.getItem(STORAGE_KEY);
+  
+  if (!voterId) {
+    // 없으면 새로 생성 (UUID v4 형식)
+    voterId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+    localStorage.setItem(STORAGE_KEY, voterId);
+  }
+  
+  return voterId;
+};
+
+// localStorage에서 투표 여부 확인
+const hasVotedForContestant = (contestantId: string): boolean => {
+  const VOTES_KEY = 'voted_contestants';
+  const votedContestants = JSON.parse(localStorage.getItem(VOTES_KEY) || '[]');
+  return votedContestants.includes(contestantId);
+};
+
+// localStorage에 투표 기록 저장
+const markAsVoted = (contestantId: string): void => {
+  const VOTES_KEY = 'voted_contestants';
+  const votedContestants = JSON.parse(localStorage.getItem(VOTES_KEY) || '[]');
+  if (!votedContestants.includes(contestantId)) {
+    votedContestants.push(contestantId);
+    localStorage.setItem(VOTES_KEY, JSON.stringify(votedContestants));
+  }
+};
+
+// localStorage에서 투표 기록 제거
+const unmarkAsVoted = (contestantId: string): void => {
+  const VOTES_KEY = 'voted_contestants';
+  const votedContestants = JSON.parse(localStorage.getItem(VOTES_KEY) || '[]');
+  const filtered = votedContestants.filter((id: string) => id !== contestantId);
+  localStorage.setItem(VOTES_KEY, JSON.stringify(filtered));
+};
+
 interface Comment {
   id: string;
   author: string;
@@ -186,41 +231,55 @@ export const ContestantCard = ({
     };
   }, [onPlayChange, name]);
 
-  // 사용자 투표 상태 확인 (enableVoteButton이 true일 때만 실행)
+  // 투표 상태 확인 (localStorage + DB 이중 체크로 완벽한 동기화)
   useEffect(() => {
     if (!enableVoteButton) return;
     
-    const checkUserVote = async () => {
+    const checkVoteStatus = async () => {
+      // 1. localStorage에서 빠르게 확인 (초기 UI 표시용)
+      const localVoted = hasVotedForContestant(id);
+      setIsLiked(localVoted);
+      
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
+        // 2. DB에서 정확하게 확인 (localStorage가 삭제되었을 수 있음)
+        const anonymousVoterId = getAnonymousVoterId();
         const { data, error } = await supabase
           .from('votes')
-          .select('*')
-          .eq('user_id', user.id)
+          .select('id')
+          .eq('anonymous_voter_id', anonymousVoterId)
           .eq('contestant_id', id)
-          .single();
-
+          .maybeSingle();
+        
         if (error) {
-          console.warn(`[${name}] 투표 상태 확인 오류:`, error.message, error.code);
-          // 406 오류인 경우 특별 처리
-          if (error.code === 'PGRST301' || error.message.includes('406')) {
-            console.warn(`[${name}] RLS 정책 문제로 투표 상태를 확인할 수 없습니다.`);
-          }
-          return;
+          console.error(`[${name}] 투표 상태 확인 오류:`, error.message);
+          return; // localStorage 값 유지
         }
-
-        if (data) {
+        
+        const dbVoted = !!data;
+        
+        // 3. localStorage와 DB 동기화
+        if (dbVoted && !localVoted) {
+          // DB에는 투표 기록이 있는데 localStorage에는 없음 → localStorage 업데이트
+          console.log(`[${name}] localStorage 재동기화: 투표 기록 복원`);
+          markAsVoted(id);
           setIsLiked(true);
+        } else if (!dbVoted && localVoted) {
+          // localStorage에는 있는데 DB에는 없음 → localStorage 제거
+          console.log(`[${name}] localStorage 재동기화: 잘못된 투표 기록 제거`);
+          unmarkAsVoted(id);
+          setIsLiked(false);
+        } else {
+          // 이미 동기화되어 있음
+          setIsLiked(dbVoted);
         }
       } catch (error) {
-        console.error(`[${name}] 투표 상태 확인 중 오류:`, error);
+        console.error(`[${name}] 투표 상태 확인 중 예외:`, error);
+        // 오류 발생 시 localStorage 값 유지
       }
     };
-
-    checkUserVote();
-  }, [id, name, enableVoteButton]);
+    
+    checkVoteStatus();
+  }, [id, enableVoteButton, name]);
 
   // 투표 수 불러오기 함수
   const fetchVoteCount = async () => {
@@ -368,41 +427,27 @@ export const ContestantCard = ({
   };
 
   const handleLike = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({
-        title: "로그인 필요",
-        description: "투표하려면 로그인해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // 익명 투표자 ID 가져오기 (로그인 불필요)
+    const anonymousVoterId = getAnonymousVoterId();
 
     try {
       if (isLiked) {
         // 투표 취소
-        console.log(`[${name}] Deleting vote for user:`, user.id);
+        console.log(`[${name}] Deleting vote for anonymous voter:`, anonymousVoterId);
         const { error } = await supabase
           .from('votes')
           .delete()
-          .eq('user_id', user.id)
+          .eq('anonymous_voter_id', anonymousVoterId)
           .eq('contestant_id', id);
 
         if (error) {
           console.error(`[${name}] 투표 삭제 오류:`, error.message, error.code);
-          if (error.code === 'PGRST301' || error.message.includes('406')) {
-            toast({
-              title: "권한 오류",
-              description: "투표를 삭제할 권한이 없습니다. 관리자에게 문의하세요.",
-              variant: "destructive",
-            });
-            return;
-          }
           throw error;
         }
         
         console.log(`[${name}] Vote deleted successfully`);
         setIsLiked(false);
+        unmarkAsVoted(id); // localStorage에서 제거
         
         // 데이터베이스에서 실제 투표 수 다시 불러오기
         await fetchVoteCount();
@@ -412,32 +457,37 @@ export const ContestantCard = ({
           description: "투표를 취소했습니다.",
         });
       } else {
-        // 투표하기 (upsert 사용으로 재투표 가능)
-        console.log(`[${name}] Inserting vote for user:`, user.id);
+        // 투표하기
+        console.log(`[${name}] Inserting vote for anonymous voter:`, anonymousVoterId);
         const { error } = await supabase
           .from('votes')
-          .upsert({
-            user_id: user.id,
-            contestant_id: id
-          }, {
-            onConflict: 'user_id,contestant_id'
+          .insert({
+            anonymous_voter_id: anonymousVoterId,
+            contestant_id: id,
+            user_id: null // 익명 투표는 user_id를 null로 설정
           });
 
         if (error) {
           console.error(`[${name}] 투표 추가 오류:`, error.message, error.code);
-          if (error.code === 'PGRST301' || error.message.includes('406')) {
+          
+          // 이미 투표한 경우 (unique constraint 위반)
+          if (error.code === '23505') {
             toast({
-              title: "권한 오류",
-              description: "투표할 권한이 없습니다. 관리자에게 문의하세요.",
+              title: "이미 투표하셨습니다",
+              description: "이 참가자에게는 이미 투표하셨습니다.",
               variant: "destructive",
             });
+            setIsLiked(true);
+            markAsVoted(id);
             return;
           }
+          
           throw error;
         }
         
         console.log(`[${name}] Vote inserted successfully`);
         setIsLiked(true);
+        markAsVoted(id); // localStorage에 저장
         
         // 데이터베이스에서 실제 투표 수 다시 불러오기
         await fetchVoteCount();
