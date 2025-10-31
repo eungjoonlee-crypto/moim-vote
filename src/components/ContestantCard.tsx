@@ -368,22 +368,16 @@ export const ContestantCard = ({
   const handleComment = async () => {
     if (!newComment.trim()) return;
     
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({
-        title: "로그인 필요",
-        description: "댓글을 작성하려면 로그인해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // 익명 댓글 작성 (로그인 불필요)
+    const anonymousVoterId = getAnonymousVoterId(); // 익명 ID 사용
 
     try {
       const { error } = await supabase
         .from('comments')
         .insert({
           contestant_id: id,
-          user_id: user.id,
+          user_id: null, // 익명 댓글은 user_id를 null로 설정
+          anonymous_voter_id: anonymousVoterId, // 익명 ID 저장
           content: newComment
         });
 
