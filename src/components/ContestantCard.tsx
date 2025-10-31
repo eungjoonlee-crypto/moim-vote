@@ -53,14 +53,39 @@ interface ContestantCardProps {
   song: string;
   youtube_url: string;
   youtube_id: string;
+  image_url?: string;
   views: number;
   likes: number;
   vote_count: number;
   isPlaying?: boolean;
   onPlayChange?: (isPlaying: boolean) => void;
+  showComments?: boolean; // 댓글 섹션 표시 여부
+  showVoteButton?: boolean; // 투표 버튼 표시 여부
+  showVoteCount?: boolean; // 투표 수 표시 여부
+  showShareButton?: boolean; // 공유 버튼 표시 여부
+  showViews?: boolean; // 조회수 표시 여부
+  showLikes?: boolean; // 좋아요 수 표시 여부
 }
 
-export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views, likes, vote_count, isPlaying = false, onPlayChange }: ContestantCardProps) => {
+export const ContestantCard = ({ 
+  id, 
+  name, 
+  song, 
+  youtube_url, 
+  youtube_id, 
+  image_url,
+  views, 
+  likes, 
+  vote_count, 
+  isPlaying = false, 
+  onPlayChange,
+  showComments: enableComments = true,
+  showVoteButton: enableVoteButton = true,
+  showVoteCount: enableVoteCount = true,
+  showShareButton: enableShareButton = true,
+  showViews: enableViews = false,
+  showLikes: enableLikes = false,
+}: ContestantCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
@@ -100,11 +125,15 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   const [videoError, setVideoError] = useState(false);
   const { toast } = useToast();
 
-  // 썸네일 URL 생성
+  // 썸네일 URL 생성 (image_url이 있으면 우선 사용)
   useEffect(() => {
-    const thumbnail = getThumbnailUrlFromLink(youtube_url, 'high');
-    setThumbnailUrl(thumbnail);
-  }, [youtube_url]);
+    if (image_url && image_url.trim().length > 0) {
+      setThumbnailUrl(image_url);
+    } else {
+      const thumbnail = getThumbnailUrlFromLink(youtube_url, 'high');
+      setThumbnailUrl(thumbnail);
+    }
+  }, [youtube_url, image_url]);
 
   // 모바일에서 카드가 뷰포트에 보이면 자동 재생, 사라지면 정지 (개선된 로직)
   useEffect(() => {
@@ -157,8 +186,10 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     };
   }, [onPlayChange, name]);
 
-  // 사용자 투표 상태 확인
+  // 사용자 투표 상태 확인 (enableVoteButton이 true일 때만 실행)
   useEffect(() => {
+    if (!enableVoteButton) return;
+    
     const checkUserVote = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -189,9 +220,9 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     };
 
     checkUserVote();
-  }, [id, name]);
+  }, [id, name, enableVoteButton]);
 
-  // 투표 수 불러오기
+  // 투표 수 불러오기 함수
   const fetchVoteCount = async () => {
     try {
       console.log(`[${name}] Fetching vote count for contestant:`, id);
@@ -217,8 +248,16 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     }
   };
 
-  // 댓글 불러오기 (컴포넌트 로드 시 항상 실행)
+  // 투표 수 불러오기 (enableVoteCount가 true일 때만 실행)
   useEffect(() => {
+    if (!enableVoteCount) return;
+    fetchVoteCount();
+  }, [id, enableVoteCount]);
+
+  // 댓글 불러오기 (enableComments가 true일 때만 실행)
+  useEffect(() => {
+    if (!enableComments) return;
+    
     const fetchComments = async () => {
       try {
         const { data, error } = await supabase
@@ -247,8 +286,7 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
     };
 
     fetchComments();
-    fetchVoteCount(); // 투표 수도 함께 불러오기
-  }, [id]);
+  }, [id, enableComments]);
 
   const handleShare = async () => {
     // 참가자 페이지 URL로 공유 (자동 재생 포함)
@@ -422,7 +460,17 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
   return (
     <Card className="overflow-hidden card-gradient border-border/50 hover:border-primary/50 transition-smooth group">
       <div ref={cardRef} className="aspect-video relative overflow-hidden bg-black">
-        {showVideo && !videoError ? (
+        {/* image_url이 지정된 경우에는 이미지 표시로 고정하고, 영상 자동재생/오버레이를 비활성화 */}
+        {image_url && image_url.trim().length > 0 ? (
+          <img
+            src={thumbnailUrl || image_url}
+            alt={`${name} - ${song}`}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iIzAwMCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SW1hZ2U8L3RleHQ+PC9zdmc+';
+            }}
+          />
+        ) : showVideo && !videoError ? (
           <iframe
             src={`https://www.youtube.com/embed/${youtube_id}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1`}
             title={`${name} - ${song}`}
@@ -496,30 +544,6 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
                 }}
               />
             )}
-            <div 
-              className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/10 transition-colors cursor-pointer"
-              onMouseEnter={() => {
-                console.log(`[${name}] Desktop hover enter`);
-                setLocalWantsToPlay(true);
-                onPlayChange?.(true);
-              }}
-              onMouseLeave={() => {
-                console.log(`[${name}] Desktop hover leave`);
-                setLocalWantsToPlay(false);
-                setShowVideo(false);
-                onPlayChange?.(false);
-              }}
-            >
-              <div className="flex flex-col items-center space-y-3">
-                <Button
-                  onClick={() => window.open(`https://www.youtube.com/watch?v=${youtube_id}`, '_blank')}
-                  size="lg"
-                  className="rounded-full w-16 h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg"
-                >
-                  <Play className="w-8 h-8 ml-1" />
-                </Button>
-              </div>
-            </div>
           </div>
         )}
       </div>
@@ -528,44 +552,63 @@ export const ContestantCard = ({ id, name, song, youtube_url, youtube_id, views,
         <div>
           <h3 className="text-2xl font-bold text-foreground mb-1">{name}</h3>
           <p className="text-muted-foreground">{song}</p>
+          {/* 조회수 및 좋아요 수 표시 (선택적) */}
+          {(enableViews || enableLikes) && (
+            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              {enableViews && (
+                <span>조회수 {views.toLocaleString()}</span>
+              )}
+              {enableLikes && (
+                <span>좋아요 {currentLikes.toLocaleString()}</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 하단 통합 버튼 레이아웃 */}
         <div className="flex items-center gap-2">
-          <Button
-            variant={isLiked ? "default" : "outline"}
-            className="flex-1"
-            onClick={handleLike}
-          >
-            <Heart className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`} />
-            {isLiked ? "투표 취소" : "투표하기"}
-          </Button>
+          {enableVoteButton && (
+            <Button
+              variant={isLiked ? "default" : "outline"}
+              className="flex-1"
+              onClick={handleLike}
+            >
+              <Heart className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`} />
+              {isLiked ? "투표 취소" : "투표하기"}
+            </Button>
+          )}
           
-          <div className="flex items-center gap-1 px-3 py-2 bg-muted/50 rounded-md border border-border/50">
-            <Heart className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{currentVoteCount.toLocaleString()}</span>
-          </div>
+          {enableVoteCount && (
+            <div className="flex items-center gap-1 px-3 py-2 bg-muted/50 rounded-md border border-border/50">
+              <Heart className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{currentVoteCount.toLocaleString()}</span>
+            </div>
+          )}
           
-          <Button variant="outline" size="icon" onClick={handleShare}>
-            <Share2 className="w-4 h-4" />
-          </Button>
+          {enableShareButton && (
+            <Button variant="outline" size="icon" onClick={handleShare}>
+              <Share2 className="w-4 h-4" />
+            </Button>
+          )}
           
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setShowComments(!showComments)}
-            className="relative"
-          >
-            <MessageCircle className="w-4 h-4" />
-            {comments.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                {comments.length}
-              </span>
-            )}
-          </Button>
+          {enableComments && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowComments(!showComments)}
+              className="relative"
+            >
+              <MessageCircle className="w-4 h-4" />
+              {comments.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {comments.length}
+                </span>
+              )}
+            </Button>
+          )}
         </div>
 
-        {showComments && (
+        {enableComments && showComments && (
           <div className="space-y-4 pt-4 border-t border-border/50">
             <div className="space-y-2">
               <Textarea

@@ -18,13 +18,6 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // 디버깅을 위한 로그
-  console.log('Hero component props:', {
-    daysLeft,
-    contestantCount,
-    title,
-    subtitle
-  });
 
   useEffect(() => {
     const getUser = async () => {
@@ -128,7 +121,7 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
         </div>
       </div>
 
-      <section className="relative overflow-hidden hero-gradient py-20 px-4">
+      <section className="relative overflow-hidden hero-gradient py-12 md:py-16 px-4">
         <div className={`fixed top-3 right-3 sm:top-4 sm:right-4 z-50 transition-opacity duration-300 ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           {loading ? (
             <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white backdrop-blur-sm" disabled>
@@ -183,29 +176,17 @@ export const Hero = ({ title, subtitle, heroImageUrl, contestantCount, daysLeft 
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center space-y-6">
             {/* 로고 이미지 */}
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-2 md:mb-3">
               <img 
                 src="/logo-transparent.png" 
                 alt="싱어게이 로고" 
-                className="h-16 md:h-20 lg:h-24 w-auto object-contain"
+                className="h-12 md:h-16 lg:h-18 w-auto object-contain"
               />
             </div>
             
-            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-medium">
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto font-medium">
               {subtitle && subtitle.trim() ? subtitle : "openmic moim 37th. 최고의 목소리에 투표해주세요"}
             </p>
-            
-            <div className="flex items-center justify-center gap-8 pt-4">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent">{typeof contestantCount === 'number' ? contestantCount : 15}</div>
-                <div className="text-sm text-white/70">참가자</div>
-              </div>
-              <div className="h-12 w-px bg-white/20" />
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent">{typeof daysLeft === 'number' ? `D-${daysLeft}` : 'D-7'}</div>
-                <div className="text-sm text-white/70">투표 마감</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

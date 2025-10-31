@@ -5,10 +5,10 @@ import { ContestantCard } from "@/components/ContestantCard";
 import { supabase } from "@/integrations/supabase/client";
 import { startPeriodicSync } from "@/lib/youtube-api";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, X, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Contestant {
   id: string;
@@ -16,10 +16,12 @@ interface Contestant {
   song: string;
   youtube_url: string;
   youtube_id: string;
+  image_url?: string;
   views: number;
   likes: number;
   vote_count: number;
   created_at: string;
+  is_visible?: boolean;
 }
 
 interface SiteSettings {
@@ -31,17 +33,22 @@ interface SiteSettings {
   hero_days_left: number | null;
   meta_title: string | null;
   meta_description: string | null;
+  show_comments: boolean | null;
+  show_vote_button: boolean | null;
+  show_vote_count: boolean | null;
+  show_share_button: boolean | null;
+  show_views: boolean | null;
+  show_likes: boolean | null;
 }
 
 const Index = () => {
   const [contestants, setContestants] = useState<Contestant[]>([]);
   const [siteSettings, setSiteSettings] = useReactState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredContestants, setFilteredContestants] = useState<Contestant[]>([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentPlayingVideo, setCurrentPlayingVideo] = useState<string | null>(null);
   const contestantsRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchContestants = async () => {
@@ -55,6 +62,7 @@ const Index = () => {
         const { data, error } = await supabase
           .from('contestants')
           .select('*')
+          .eq('is_visible', true) // 노출 여부가 true인 참가자만 가져오기
           .order('created_at', { ascending: true });
 
         if (error) {
@@ -81,7 +89,6 @@ const Index = () => {
         }
         
         setContestants(shuffledContestants);
-        setFilteredContestants(shuffledContestants);
 
         // URL 파라미터에서 특정 참가자 ID 확인
         const urlParams = new URLSearchParams(window.location.search);
@@ -194,32 +201,6 @@ const Index = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 검색 기능
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    if (!query.trim()) {
-      setFilteredContestants(contestants);
-      return;
-    }
-
-    const filtered = contestants.filter(contestant => 
-      contestant.name.toLowerCase().includes(query.toLowerCase()) ||
-      contestant.song.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredContestants(filtered);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setFilteredContestants(contestants);
-  };
-
-  const scrollToContestants = () => {
-    if (contestantsRef.current) {
-      contestantsRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -245,67 +226,66 @@ const Index = () => {
         daysLeft={siteSettings?.hero_days_left ?? undefined}
       />
       
-      {/* 검색 섹션 */}
-      <section className="py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="flex gap-3 max-w-3xl mx-auto">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="참가자번호 입력 후 검색"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 pr-10 py-4 text-lg h-14"
-              />
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearSearch}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-            <Button
-              onClick={() => {
-                handleSearch(searchQuery);
-                setTimeout(() => scrollToContestants(), 100);
-              }}
-              className="px-4 py-2 h-14 text-lg"
-            >
-              검색
-            </Button>
-          </div>
-        </div>
-      </section>
-      
       <main className="container mx-auto px-4 py-16 max-w-7xl">
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
-            투표 및 응원하기
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            로그인하시면 투표 및 댓글작성이 가능합니다.
-          </p>
-        </div>
 
         {contestants.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-muted-foreground text-lg">아직 참가자가 없습니다.</p>
           </div>
-        ) : filteredContestants.length === 0 && searchQuery ? (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">검색 결과가 없습니다.</p>
-            <Button variant="outline" onClick={clearSearch} className="mt-4">
-              검색 초기화
-            </Button>
+        ) : isMobile ? (
+          // 모바일: 카로셀 형태로 좌우 슬라이드
+          <div ref={contestantsRef} className="w-full relative">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: false,
+                dragFree: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {contestants.map((contestant) => (
+                  <CarouselItem key={contestant.id} className="pl-4 basis-full" data-contestant-id={contestant.id}>
+                    <ContestantCard 
+                      id={contestant.id}
+                      name={contestant.name}
+                      song={contestant.song}
+                      youtube_url={contestant.youtube_url}
+                      youtube_id={contestant.youtube_id}
+                      image_url={contestant.image_url}
+                      views={contestant.views}
+                      likes={contestant.likes}
+                      vote_count={contestant.vote_count}
+                      isPlaying={currentPlayingVideo === contestant.id}
+                      onPlayChange={(isPlaying) => {
+                        console.log(`[Index] Contestant ${contestant.name} (${contestant.id}) play change: ${isPlaying}`);
+                        if (isPlaying) {
+                          // 새 영상이 재생되면 이전 영상 정지
+                          setCurrentPlayingVideo(contestant.id);
+                        } else if (currentPlayingVideo === contestant.id) {
+                          // 현재 재생 중인 영상이 정지되면 재생 상태 초기화
+                          setCurrentPlayingVideo(null);
+                        }
+                      }}
+                      showComments={siteSettings?.show_comments ?? true}
+                      showVoteButton={siteSettings?.show_vote_button ?? true}
+                      showVoteCount={siteSettings?.show_vote_count ?? true}
+                      showShareButton={siteSettings?.show_share_button ?? true}
+                      showViews={siteSettings?.show_views ?? false}
+                      showLikes={siteSettings?.show_likes ?? false}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {/* 모바일에서 카드 위에 반투명 플로팅 버튼 */}
+              <CarouselPrevious className="!left-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-background/80 backdrop-blur-sm border-border/50 hover:bg-background/90 shadow-lg z-10" />
+              <CarouselNext className="!right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-background/80 backdrop-blur-sm border-border/50 hover:bg-background/90 shadow-lg z-10" />
+            </Carousel>
           </div>
         ) : (
+          // 데스크톱: 기존 grid 레이아웃
           <div ref={contestantsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredContestants.map((contestant) => (
+            {contestants.map((contestant) => (
               <div key={contestant.id} data-contestant-id={contestant.id}>
                 <ContestantCard 
                   id={contestant.id}
@@ -313,6 +293,7 @@ const Index = () => {
                   song={contestant.song}
                   youtube_url={contestant.youtube_url}
                   youtube_id={contestant.youtube_id}
+                  image_url={contestant.image_url}
                   views={contestant.views}
                   likes={contestant.likes}
                   vote_count={contestant.vote_count}
@@ -327,6 +308,12 @@ const Index = () => {
                       setCurrentPlayingVideo(null);
                     }
                   }}
+                  showComments={siteSettings?.show_comments ?? true}
+                  showVoteButton={siteSettings?.show_vote_button ?? true}
+                  showVoteCount={siteSettings?.show_vote_count ?? true}
+                  showShareButton={siteSettings?.show_share_button ?? true}
+                  showViews={siteSettings?.show_views ?? false}
+                  showLikes={siteSettings?.show_likes ?? false}
                 />
               </div>
             ))}
