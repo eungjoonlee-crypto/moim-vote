@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase DB 연결 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .error {
+            color: #f87171;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Supabase DB 연결 테스트</h1>
+    
+    <div class="test-section">
+        <h2>1. 연결 정보</h2>
+        <pre id="connection-info"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 참가자 데이터 조회</h2>
+        <button onclick="testContestants()">참가자 조회 테스트</button>
+        <pre id="contestants-result"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 투표 데이터 조회</h2>
+        <button onclick="testVotes()">투표 데이터 조회 테스트</button>
+        <pre id="votes-result"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 투표 수 계산</h2>
+        <button onclick="testVoteCount()">투표 수 계산 테스트</button>
+        <pre id="vote-count-result"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. 인증 상태</h2>
+        <button onclick="testAuth()">인증 상태 확인</button>
+        <pre id="auth-result"></pre>
+    </div>
+
+    <script>
+        // Supabase 클라이언트 생성
+        const SUPABASE_URL = 'https://gmujzyyvdllvapbphtnw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdWp6eXl2ZGxsdmFwYnBodG53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NzQ4MDgsImV4cCI6MjA3NTI1MDgwOH0.bwuoIIARm9FayJ2zavqUVIywAIjXDsLVlSkemQAxkY0';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // 연결 정보 표시
+        document.getElementById('connection-info').innerHTML = 
+            `<span class="success">✅ Supabase URL: ${SUPABASE_URL}</span>\n` +
+            `<span class="success">✅ API Key: ${SUPABASE_KEY.substring(0, 30)}...</span>`;
+        
+        // 참가자 데이터 조회
+        async function testContestants() {
+            const result = document.getElementById('contestants-result');
+            result.innerHTML = '⏳ 조회 중...';
+            
+            try {
+                const { data, error, count } = await supabase
+                    .from('contestants')
+                    .select('id, name, song, vote_count, views, likes', { count: 'exact' });
+                
+                if (error) {
+                    result.innerHTML = `<span class="error">❌ 에러: ${error.message}</span>\n${JSON.stringify(error, null, 2)}`;
+                } else {
+                    result.innerHTML = 
+                        `<span class="success">✅ 성공! ${count || data.length}명의 참가자를 찾았습니다.</span>\n\n` +
+                        JSON.stringify(data, null, 2);
+                }
+            } catch (err) {
+                result.innerHTML = `<span class="error">❌ 예외 발생: ${err.message}</span>`;
+            }
+        }
+        
+        // 투표 데이터 조회
+        async function testVotes() {
+            const result = document.getElementById('votes-result');
+            result.innerHTML = '⏳ 조회 중...';
+            
+            try {
+                const { data, error, count } = await supabase
+                    .from('votes')
+                    .select('*', { count: 'exact' });
+                
+                if (error) {
+                    result.innerHTML = `<span class="error">❌ 에러: ${error.message}</span>\n${JSON.stringify(error, null, 2)}`;
+                } else {
+                    result.innerHTML = 
+                        `<span class="success">✅ 성공! 총 ${count || data.length}개의 투표를 찾았습니다.</span>\n\n` +
+                        JSON.stringify(data, null, 2);
+                }
+            } catch (err) {
+                result.innerHTML = `<span class="error">❌ 예외 발생: ${err.message}</span>`;
+            }
+        }
+        
+        // 투표 수 계산
+        async function testVoteCount() {
+            const result = document.getElementById('vote-count-result');
+            result.innerHTML = '⏳ 조회 중...';
+            
+            try {
+                // 모든 참가자의 실제 투표 수 계산
+                const { data: contestants, error: contestantsError } = await supabase
+                    .from('contestants')
+                    .select('id, name, vote_count');
+                
+                if (contestantsError) throw contestantsError;
+                
+                const results = [];
+                for (const contestant of contestants) {
+                    const { count, error } = await supabase
+                        .from('votes')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('contestant_id', contestant.id);
+                    
+                    results.push({
+                        name: contestant.name,
+                        vote_count_in_table: contestant.vote_count || 0,
+                        actual_vote_count: count || 0,
+                        match: (contestant.vote_count || 0) === (count || 0) ? '✅' : '❌'
+                    });
+                }
+                
+                result.innerHTML = 
+                    `<span class="success">✅ 투표 수 계산 완료</span>\n\n` +
+                    JSON.stringify(results, null, 2);
+            } catch (err) {
+                result.innerHTML = `<span class="error">❌ 에러: ${err.message}</span>`;
+            }
+        }
+        
+        // 인증 상태 확인
+        async function testAuth() {
+            const result = document.getElementById('auth-result');
+            result.innerHTML = '⏳ 확인 중...';
+            
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) {
+                    result.innerHTML = `<span class="error">❌ 에러: ${error.message}</span>`;
+                } else if (user) {
+                    result.innerHTML = 
+                        `<span class="success">✅ 로그인됨</span>\n\n` +
+                        `User ID: ${user.id}\n` +
+                        `Email: ${user.email}\n` +
+                        JSON.stringify(user, null, 2);
+                } else {
+                    result.innerHTML = `<span>ℹ️ 로그인되지 않음 (익명 사용자)</span>`;
+                }
+            } catch (err) {
+                result.innerHTML = `<span class="error">❌ 예외 발생: ${err.message}</span>`;
+            }
+        }
+        
+        // 페이지 로드 시 자동 테스트
+        window.onload = async () => {
+            await testContestants();
+            await testVotes();
+            await testVoteCount();
+            await testAuth();
+        };
+    </script>
+</body>
+</html>
+

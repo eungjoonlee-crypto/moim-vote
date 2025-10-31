@@ -5,7 +5,7 @@ import { startPeriodicSync } from '@/lib/youtube-api';
  * 자동 동기화 훅
  * 주기적으로 YouTube 데이터를 동기화합니다.
  */
-export const useAutoSync = (intervalMinutes: number = 30, enabled: boolean = true) => {
+export const useAutoSync = (intervalMinutes: number = 60, enabled: boolean = true) => {
   const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {

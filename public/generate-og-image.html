@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate OG Image</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .preview {
+            margin: 20px 0;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>OG Image Generator</h1>
+    <p>Right-click on the image below and save as "og-image.png"</p>
+    
+    <div class="preview">
+        <canvas id="canvas" width="1200" height="630"></canvas>
+    </div>
+    
+    <button onclick="downloadImage()">Download as og-image.png</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        gradient.addColorStop(0, '#dc2626'); // Red
+        gradient.addColorStop(1, '#7c3aed'); // Purple
+
+        // Fill background
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        // Add grid pattern
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 1200; i += 60) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, 630);
+            ctx.stroke();
+        }
+        for (let i = 0; i < 630; i += 60) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(1200, i);
+            ctx.stroke();
+        }
+
+        // Main title
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 72px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('openmic moim 37th', 600, 280);
+
+        // Subtitle
+        ctx.font = '32px Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillText('최고의 목소리에 투표해주세요', 600, 350);
+
+        // Description
+        ctx.font = '24px Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillText('싱어게이 : 퀴어가수전', 600, 400);
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'og-image.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
