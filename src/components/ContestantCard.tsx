@@ -622,13 +622,6 @@ export const ContestantCard = ({
             </Button>
           )}
           
-          {enableVoteCount && (
-            <div className="flex items-center gap-1 px-3 py-2 bg-muted/50 rounded-md border border-border/50">
-              <Heart className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">{currentVoteCount.toLocaleString()}</span>
-            </div>
-          )}
-          
           {enableShareButton && (
             <Button variant="outline" size="icon" onClick={handleShare}>
               <Share2 className="w-4 h-4" />
